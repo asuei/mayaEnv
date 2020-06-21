@@ -1,0 +1,103 @@
+// 如果Maya在 Hotkey set 中是  Maya Default 的話無法變更, 要先取消 Maya default
+//currently need : asueiHotbox.mel as_naming.py
+// $scrptPath = "D:\/asuei.ling\/cScripts\/" ;
+// $scrptPath = "D:\/workingProjects\/Maya_project\/scriptsBase\/" ;
+
+// Asuei Hotbox : press ` and release // hotkey -q -name "`" ;
+hotkey -keyShortcut "`" -name "" ;
+nameCommand -ann "AsueiHotbox" -c ("source \""+$scrptPath+"asueiHotbox.mel\"; asueiHotbox;") asueiHotboxCmd ;
+nameCommand -ann "AsueiHotboxRelease" -c ("if(`window -exists win_ConsG`) deleteUI -window win_ConsG ; if(`window -exists win_DeG`) deleteUI -window win_DeG ; if(`window -exists win_GoC`) deleteUI -window win_GoC ; if(`window -exists win_GoS`) deleteUI -window win_GoS ; if(`window -exists win_GoOs`) deleteUI -window win_GoOs ; if(`window -exists win_GoSet`) deleteUI -window win_GoSet ;") asueiHotboxReleaseCmd ;
+hotkey -keyShortcut "`" -name "asueiHotboxCmd" -releaseName "asueiHotboxReleaseCmd" ;
+
+// Taggle Wireframe : Alt + w // hotkey -q -alt -name "w" ;
+hotkey -keyShortcut "w" -alt -name "" ;
+nameCommand -ann "tglWireframe" -c ("{ $gpf = `getPanel -withFocus` ; setWireframeOnShadedOption (1-`modelEditor -q -wos $gpf`) $gpf ; }") tglWireframeCmd ;
+hotkey -keyShortcut "w" -altModifier -name "tglWireframeCmd" ;
+
+// Taggle X-Ray : Alt + x // hotkey -q -alt -name "x" ;
+hotkey -keyShortcut "x" -alt -name "" ;
+nameCommand -ann "tglXray" -c ("{ $sl = ` ls -sl -l `; for($x in $sl) $xr = `displaySurface -q -xRay $x`; displaySurface -xRay (1-$xr[0]) $x ; }") tglXrayCmd ;
+hotkey -keyShortcut "x" -altModifier -name "tglXrayCmd" ;
+
+// Taggle Isolate select : Alt + z // hotkey -q -alt -name "z" ;
+hotkey -keyShortcut "z" -alt -name "" ;
+nameCommand -ann "tglIsolate" -c ("{ $gpf = `getPanel -withFocus` ; $iss = `isolateSelect -q -state $gpf` ; isolateSelect -state (1-$iss) $gpf ; enableIsolateSelect $gpf (1-$iss) ; }") tglIsolateCmd ;
+hotkey -keyShortcut "z" -altModifier -name "tglIsolateCmd" ;
+
+// Component Window : Alt + 1 // hotkey -q -alt -name "1" ;
+hotkey -keyShortcut "1" -alt -name "" ;
+nameCommand -ann "componentWindow" -c ("tearOffPanel \"Component Editor\" \"componentEditorPanel\" true;") componentWindowCmd ;
+hotkey -keyShortcut "1" -altModifier -name "componentWindowCmd";
+
+// Outliner : Alt + 2 // hotkey -q -alt -name "2" ;
+hotkey -keyShortcut "2" -alt -name "" ;
+nameCommand -ann "outlinerWindow" -c ("tearOffPanel \"Outliner\" \"outlinerPanel\" false;") outlinerWindowCmd ;
+hotkey -keyShortcut "2" -altModifier -name "outlinerWindowCmd";
+
+// Node Editor : Alt + 3 // hotkey -q -alt -name "3" ;
+hotkey -keyShortcut "3" -alt -name "" ;
+nameCommand -ann "nodeEditorWindow" -c ("nodeEditorWindow;") nodeEditorWindowCmd ;
+hotkey -keyShortcut "3" -altModifier -name "nodeEditorWindowCmd";
+
+
+
+// Rename Tool : Alt + 4 // hotkey -q -alt -name "4" ;
+hotkey -keyShortcut "4" -alt -name "" ;
+nameCommand -ann "renameWindow" -c ("python(\"exec \\\"try: reload(as_naming)\\\\nexcept NameError: import naming\\\"\");") renameWindowCmd ;
+hotkey -keyShortcut "4" -altModifier -name "renameWindowCmd";
+
+// Graph Editor : Alt + a // hotkey -q -alt -name "a" ;
+hotkey -keyShortcut "a" -alt -name "" ;
+nameCommand -ann "graphEditorWindow" -c ("tearOffPanel \"Graph Editor\" \"graphEditor\" true;") graphEditorWindowCmd ;
+hotkey -keyShortcut "a" -altModifier -name "graphEditorWindowCmd";
+
+// Connection Editor : Alt + c // hotkey -q -alt -name "c" ;
+hotkey -keyShortcut "c" -alt -name "" ;
+nameCommand -ann "connectionWindow" -c ("optionVar -iv \"connectWindowActive\" 1; connectWindow 0 \"\" \"\";") connectionWindowCmd ;
+hotkey -keyShortcut "c" -altModifier -name "connectionWindowCmd";
+
+// Channel Control : Alt + n // hotkey -q -alt -name "n" ;
+hotkey -keyShortcut "n" -alt -name "" ;
+nameCommand -ann "channelControlWindow" -c ("lockingKeyableWnd;") channelControlWindowCmd ;
+hotkey -keyShortcut "n" -altModifier -name "channelControlWindowCmd";
+
+// Hypershade : Alt + h // hotkey -q -alt -name "h" ;
+hotkey -keyShortcut "h" -alt -name "" ;
+nameCommand -ann "hypershadeWindow" -c ("tearOffPanel \"Hypershade\" \"hyperShadePanel\" true;") hypershadeWindowCmd ;
+hotkey -keyShortcut "h" -altModifier -name "hypershadeWindowCmd";
+
+// UV Editor : Alt + v // hotkey -q -alt -name "v" ;
+hotkey -keyShortcut "v" -alt -name "" ;
+nameCommand -ann "uvWindow" -c ("TextureViewWindow;") uvWindowCmd ;
+hotkey -keyShortcut "v" -altModifier -name "uvWindowCmd";
+
+// Plug-in Manager : Alt + p // hotkey -q -alt -name "p" ;
+hotkey -keyShortcut "p" -alt -name "" ;
+nameCommand -ann "pluginWindow" -c ("PluginManager;") pluginWindowCmd ;
+hotkey -keyShortcut "p" -altModifier -name "pluginWindowCmd";
+
+// Reference Editor : Alt + r // hotkey -q -alt -name "r" ;
+hotkey -keyShortcut "r" -alt -name "" ;
+nameCommand -ann "referenceWindow" -c ("tearOffPanel \"Reference Editor\" referenceEditor true;") referenceWindowCmd ;
+hotkey -keyShortcut "r" -altModifier -name "referenceWindowCmd";
+
+// Shape Editor : Alt + v // hotkey -q -alt -name "s" ;
+hotkey -keyShortcut "s" -alt -name "" ;
+nameCommand -ann "uvWindow" -c ("tearOffRestorePanel \"Shape Editor\" \"shapePanel\" false;") shapeEditorCmd ;
+hotkey -keyShortcut "s" -altModifier -name "shapeEditorCmd";
+
+// Namespace Editor : Alt + t // hotkey -q -alt -name "t" ;
+hotkey -keyShortcut "t" -alt -name "" ;
+nameCommand -ann "namespaceEditor" -c ("NamespaceEditor;") namespaceEditorCmd ;
+hotkey -keyShortcut "t" -altModifier -name "namespaceEditorCmd";
+
+// Toggle Select Mode : Alt + F1 // hotkey -q -alt -name "F1" ;
+hotkey -keyShortcut "F1" -alt -name "" ;
+nameCommand -ann "Change select mode" -c ("if(`selectMode -q -object`==1) selectMode -component ; else if(`selectMode -q -component`==true) selectMode -object ;") changeSelectModeCmd ;
+hotkey -keyShortcut "F1" -altModifier -name "changeSelectModeCmd";
+
+//hotkey -q -alt -name "q" ;
+//hotkey -q -alt -name "e" ;
+//hotkey -q -alt -name "f" ;
+//hotkey -q -alt -name "g" ;
+//hotkey -q -alt -name "F2" ;
