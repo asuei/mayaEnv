@@ -1,30 +1,35 @@
 global proc asueiHotbox(){
  python("import maya.cmds as cmds");
 
-$sl = `ls -selection -objectsOnly` ;
-$eSel = 2 ; //Selected amount
-$eSkin = 0 ; $eBs = 0 ; $eCc = 0 ; $eCloth = 0 ;
+ $sl = `ls -selection -objectsOnly` ;
+ $eSel = 2 ; //Selected amount
+ $eSkin = 0 ; $eBs = 0 ; $eCc = 0 ; $eCloth = 0 ; $eCrv = 0 ;
 
+ if(size($sl)==0) $eSel = 0 ;
+ if(size($sl)==1) $eSel = 1 ;
 
-$slds = size(`ls -sl -dag`) ;
-if(size($sl)==0) $eSel = 0 ;
-if(size($sl)==1) $eSel = 1 ;
-
-
-for($x in $sl){
- $gc = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
- for($y in $gc){
-  $nt = ` nodeType $y ` ;
-  if($nt=="skinCluster") $eSkin = 1 ;
-  if($nt=="blendShape") $eBs = 1 ;
-  if($nt=="cluster") $eCc = 1 ;
+ for($x in $sl){
+  $gc = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
+  for($y in $gc){
+   $nt = ` nodeType $y ` ;
+   if($nt=="skinCluster") $eSkin = 1 ;
+   if($nt=="blendShape") $eBs = 1 ;
+   if($nt=="cluster") $eCc = 1 ;
+  }
+  $gc = ` listHistory -interestLevel 1 -pruneDagObjects 0 $x ` ;
+  for($y in $gc){
+   $nt = ` nodeType $y ` ;
+   if($nt=="nCloth") $eCloth = 1 ;
+  }
+  $nt = ` nodeType $x ` ;
+  if($nt=="transform"){
+   $s = ` listRelatives -shapes -path $x ` ;
+   $nt = ` nodeType $s[0] ` ;
+  }
+  if($nt=="nurbsCurve"){
+   $eCrv = 1 ;
+  }
  }
- $gc = ` listHistory -interestLevel 1 -pruneDagObjects 0 $x ` ;
- for($y in $gc){
-  $nt = ` nodeType $y ` ;
-  if($nt=="nCloth") $eCloth = 1 ;
- }
-}
 
 
 //$slvn = ` polyEvaluate -vertexComponent ` ;
@@ -148,7 +153,7 @@ iconTextButton -style "iconAndTextCentered" -image1 "bakeAnimation.png" -command
 iconTextButton -style "iconAndTextCentered" -image1 "polyType.png" -command ("performSearchReplaceNames 1") -annotation "Search Replace Names" ;
 iconTextButton -style "iconAndTextCentered" -image1 "scriptEdPersp.png" -command ("as_scriptFolderUI") -annotation "Scripts Folder" ;
 
-int $bc = $eSkin*7 + $eBs*1 + $eCc*1 + $eCloth*1 ;
+int $bc = $eSkin*7 + $eBs*1 + $eCc*1 + $eCloth*1 + $eCrv*2 ;
 if($bc<0) nodeIconButton -image1 "directionallight.png" -c ("defaultDirectionalLight(1, 1,1,1, \"0\", 0,0,0, 0)") ;
 if($bc<1) nodeIconButton -image1 "circle.png" -command ("circle") ;
 if($bc<2) nodeIconButton -image1 "curveCV.png" -command ("CVCurveTool") ;
@@ -171,7 +176,8 @@ if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "detachSkin.png" -command ("
 if($eCc==1) nodeIconButton -bgc .2 .15 .2 -image1 "paintCluster.png" -command ("artAttrToolScript 4 \"cluster\";") ;
 if($eBs==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "paintBlendshape.png" -command ("ArtPaintBlendShapeWeightsToolOptions;") ;
 if($eCloth==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "nConstraintTearable.png" -command ("setNClothMapType(\"inputAttract\",\"\",1); artAttrNClothToolScript 4 inputAttract;") ;
-
+if($eCrv==1) nodeIconButton -bgc .15 .15 .2 -image1 "curveEP.png" -label "CV" -command ("ToggleCVs") ;
+if($eCrv==1) nodeIconButton -bgc .15 .15 .2 -image1 "rebuildCurve.png" -command ("RebuildCurveOptions") ;
 
 //==============================
 //   |++|   |ooooo|
@@ -1309,13 +1315,19 @@ global proc int as_attrSliderUI(){
   if(size($cb)==0){ print "No selected attribute"; return 0 ; }
   $j = 0 ;
   while($j<size($cb)){
-   $an = $sls[$i] + "." + $cb[$j] ;
-   $ran = $sll[$i] + "." + $cb[$j] ;
+   $an = $sls[$i] + "." + $cb[$j] ; // attribute name
+   $ran = $sll[$i] + "." + $cb[$j] ; // real attribute name
    float $v = ` getAttr $ran ` ;
-   float $vr = 50.0 ;
-   if(` getAttr -type $ran `=="doubleAngle") $vr = 120 ;
-   if(` getAttr -type $ran `=="double") $vr = 3 ;
-   floatSliderGrp -label $an -field true -columnAlign 2 right -value $v -min ($v-$vr) -max ($v+$vr) -step ($vr/100) -dragCommand ("setAttr "+$ran+" #1") ;
+   float $minV = $v - 50 ;
+   float $maxV = $v + 50 ;
+   if(`addAttr -q -exists $ran`){
+	if(`addAttr -q -hasMinValue $ran`) $minV = ` addAttr -q -minValue $ran ` ;
+	if(`addAttr -q -hasMaxValue $ran`) $maxV = ` addAttr -q -maxValue $ran ` ;
+   }else{
+    if(` getAttr -type $ran `=="doubleAngle") $minV = $v - 120 ; $maxV = $v + 120 ;
+   }
+   $sn = "fsbg_" + $sls[$i] + "_" + $cb[$j] ; // slider name
+   floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step ($vr/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
    $j++;
   }
   $i++ ;
