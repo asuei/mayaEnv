@@ -1327,7 +1327,7 @@ global proc int as_attrSliderUI(){
     if(` getAttr -type $ran `=="doubleAngle") $minV = $v - 120 ; $maxV = $v + 120 ;
    }
    $sn = "fsbg_" + $sls[$i] + "_" + $cb[$j] ; // slider name
-   floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step ($vr/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
+   floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step (($maxV-$minV)/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
    $j++;
   }
   $i++ ;
