@@ -24,7 +24,7 @@ global proc asueiHotbox(){
   $nt = ` nodeType $x ` ;
   if($nt=="transform"){
    $s = ` listRelatives -shapes -path $x ` ;
-   $nt = ` nodeType $s[0] ` ;
+   if(size($s)>0) $nt = ` nodeType $s[0] ` ;
   }
   if($nt=="nurbsCurve"){
    $eCrv = 1 ;
@@ -111,21 +111,21 @@ if($ctx=="artAttrSkinContext"){
   nodeIconButton -style "iconAndTextHorizontal" -image1 $ic -label $x -c ("select -r "+$x) ;
  }
 }else if($eSel==2){
- nodeIconButton -style "iconAndTextHorizontal" -image1 "posConstraint.png" -label "Point (snap)" -c ("pointConstraint -offset 0 0 0 -weight 1") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "orientConstraint.png" -label "Orient (snap)" -command ("orientConstraint -offset 0 0 0 -weight 1;") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "posConstraint.png" -label "Point (snap)" -noDefaultPopup -command ("pointConstraint -offset 0 0 0 -weight 1") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "orientConstraint.png" -label "Orient (snap)" -noDefaultPopup -command ("orientConstraint -offset 0 0 0 -weight 1;") ;
  rowLayout -numberOfColumns 2 -columnWidth2 90 25 ;
-  nodeIconButton -style "iconAndTextHorizontal" -image1 "parentConstraint.png" -label "Parent      " -command ("parentConstraint -weight 1") ;
-  nodeIconButton -style "iconAndTextHorizontal" -image1 "nConstraintMembership.png" -command ("parentConstraint -mo -weight 1") ;
+  shelfButton -style "iconAndTextHorizontal" -image1 "parentConstraint.png" -label "Parent      " -noDefaultPopup -command ("parentConstraint -weight 1") ;
+  shelfButton -style "iconAndTextHorizontal" -image1 "nConstraintMembership.png" -noDefaultPopup -command ("parentConstraint -mo -weight 1") ;
  setParent ..;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "scaleConstraint.png" -label "Scale (snap)" -command ("doCreateScaleConstraintArgList 1 { \"0\",\"1\",\"1\",\"1\",\"0\",\"0\",\"0\",\"1\",\"\",\"1\" };") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "aimConstraint.png" -label "Aim Option" -command ("AimConstraintOptions;") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "scaleConstraint.png" -label "Scale (snap)" -noDefaultPopup -command ("doCreateScaleConstraintArgList 1 { \"0\",\"1\",\"1\",\"1\",\"0\",\"0\",\"0\",\"1\",\"\",\"1\" };") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "aimConstraint.png" -label "Aim Option" -noDefaultPopup -command ("AimConstraintOptions;") ;
  rowLayout -numberOfColumns 3 -columnWidth3 65 34 25 ;
-  nodeIconButton -style "iconAndTextHorizontal" -image1 "render_decomposeMatrix.png" -label "trans" -command ("as_transValue({1,1,1,1},0,0)") ashb_tvt ;
+  shelfButton -style "iconAndTextHorizontal" -image1 "render_decomposeMatrix.png" -label "trans" -noDefaultPopup -command ("as_transValue({1,1,1,1},0,0)") ashb_tvt ;
    popupMenu -parent ashb_tvt ;
    menuItem -label "minus" -command ("as_transValue({1,-1,-1,-1},0,0)") ;
    menuItem -label "minus x only" -command ("as_transValue({1,-1,1,1},0,0)") ;
-  nodeIconButton -style "textOnly" -label "rotate" -height 35 -command ("as_transValue({0},1,0)") ;
-  nodeIconButton -style "textOnly" -label "scale" -height 35 -command ("as_transValue({0},0,1)") ;
+  shelfButton -style "textOnly" -label "rotate" -height 35 -noDefaultPopup -command ("as_transValue({0},1,0)") ;
+  shelfButton -style "textOnly" -label "scale" -height 35 -noDefaultPopup -command ("as_transValue({0},0,1)") ;
   setParent ..;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -command ("asMatrixCons") ashb_mc ;
   popupMenu -parent ashb_mc ;
@@ -164,7 +164,6 @@ if($bc<6) nodeIconButton -image1 "polySphere.png" -command ("polySphere -r 1 -sx
 //if($bc<7) nodeIconButton -image1 "sphere.png" -command ("sphere") ;
 if($bc<7) nodeIconButton -image1 "polyMesh.png" -c ("polyPlane -w 10 -h 10 -sx 10 -sy 10 ;") ;
 if($bc<8) nodeIconButton -image1 "locator.png" -c ("spaceLocator") ;
-
 
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "paintSkinWeights.png" -command ("ArtPaintSkinWeightsTool") ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
@@ -233,7 +232,7 @@ iconTextButton -image1 "kinJoint.png" -command ("$tr = `createNode transform` ; 
 iconTextButton -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashk_ikh ;
  popupMenu -parent ashk_ikh ;
  menuItem -label "spline IK Tool" -command ("IKSplineHandleToolOptions") ;
-iconTextButton -image1 "smoothSkin.png" -command ("skinCluster -mi 4 -dr 12.0 -tsb -bm 0 -ibp -rui 0 -sm 0 -nw 1") -annotation "Bind." ;
+iconTextButton -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ;
 iconTextButton -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashk_ai ;
  popupMenu -parent ashk_ai ;
  menuItem -label "remove influence" -command ("RemoveInfluence") ;
@@ -1041,6 +1040,40 @@ global proc as_pureDupli(){
   }
   select -r $dr ;
  }
+}
+
+
+global proc as_smoothBindSkin(){
+ $sl = ` ls -selection -long ` ;
+ string $jo[] ;
+ string $inf[] ;
+ string $geo[] ;
+ string $bdo[] ; // binded object
+ for($x in $sl){ 
+  $nt = ` nodeType $x ` ;
+  if($nt=="transform"){
+   $s = ` listRelatives -shapes -noIntermediate $x ` ;
+   if(size($s)>0){
+    $snt = ` nodeType $s[0] ` ;
+	if($snt=="mesh"||$snt=="nurbsCurve"||$snt=="nurbsSurface"){
+     $geo[size($geo)] = $s[0] ;
+     $bdo[size($bdo)] = $x ;
+	}
+	if($snt=="locator") $inf[size($inf)] = $x ;
+   }else{
+	$inf[size($inf)] = $x ;
+   }
+  }
+  if($nt=="joint") $jo[size($jo)] = $x ;
+ }
+ for($x in $geo){
+  if(size($jo)>0){
+   $sk = ` skinCluster -bindMethod 0 -dropoffRate 12.0 -maximumInfluences 4 -skinMethod 0 -toSelectedBones -ignoreBindPose -removeUnusedInfluence false -normalizeWeights 1 $jo $x ` ;
+   if(size($inf)>0) skinCluster -e -addInfluence $inf -weight 0 $sk ;
+  }
+  //-ignoreSelected -toSkeletonAndTransforms -toSelectedBones
+ }
+ if(size($geo)>0) select -replace $bdo ;
 }
 
 
