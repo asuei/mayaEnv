@@ -63,21 +63,21 @@ if(size($lsf)>0){
 window -title "Constrain Grid" -titleBar 0 -resizeToFitChildren on win_ConsG ;
 gridLayout -numberOfColumns 1 -cellWidthHeight 130 35;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "projectCurve_Poly.png" -label "nodeType" -command ("$sl = `ls -sl`; inViewMessage -smg (`nodeType $sl[0]`) -pos botCenter -bkc 0x00000000 -fade ; print (`nodeType $sl[0]`);") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "pointlight.png" -label "be parentCons" -command ("as_beConstraint(1,1,0)") ashk_beCons ;
-  popupMenu -parent ashk_beCons ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "pointlight.png" -label "be parentCons" -command ("as_beConstraint(1,1,0)") ashb_beCons ;
+  popupMenu -parent ashb_beCons ;
   menuItem -label "be pointCons" -command ("as_beConstraint(1,0,0)") ;
   menuItem -label "be orientCons" -command ("as_beConstraint(0,1,0)") ;
  rowLayout -numberOfColumns 2 -columnWidth2 65 65 ;
   nodeIconButton -style "iconAndTextHorizontal" -width 65 -height 35 -label "source" -command ("as_selIoPut\(0\)") ;
   nodeIconButton -style "iconAndTextHorizontal" -width 65 -height 35 -label "output" -command ("as_selIoPut\(1\)") ;
   setParent ..;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "skin.png" -label "Constrain Source" -command ("constrainSource") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "nConstraintReplaceMembers.png" -label "Delete Constrains" -command ("delConstrain;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "skin.png" -label "Constrain Source" -command ("as_constrainSource") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "nConstraintReplaceMembers.png" -label "Delete Constrains" -command ("as_delConstrain") ;
  
 $ctx = `currentCtx`;
 //print $ctx ;
 if($ctx=="artAttrSkinContext"){
- nodeIconButton -style "iconAndTextHorizontal" -image1 "smoothSkinWeights.png" -label "Switch Display"-command ("as_swapArtSkin;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "smoothSkinWeights.png" -label "Switch Display"-command ("as_swapArtSkin") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrSkinPaintCtx Replace; artSkinSetSelectionValue 0 false artAttrSkinPaintCtx artAttrSkin;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.01 false artAttrSkinPaintCtx artAttrSkin;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.025 false artAttrSkinPaintCtx artAttrSkin;") ;
@@ -87,13 +87,13 @@ if($ctx=="artAttrSkinContext"){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.1 false artAttrSkinPaintCtx artAttrSkin;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "interactiveBindTool.png" -label "Scale 0.5"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.5 false artAttrSkinPaintCtx artAttrSkin;") ;
 }else if($eSel==0){
- nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "animtion key"-command ("ahk_animKey(\"\")") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "same name node"-command ("as_sameName;") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "bindPose" -c (" as_delPose; ") ashBtn_dbp ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer;") ashBtn_dtt ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "intermediate Obj" -command ("as_delImobj;") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused;") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown node" -command ("as_delUnknown;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "animtion key"-command ("as_animKey(\"\")") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "same name node"-command ("as_sameName") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "bindPose" -c ("as_delPose") ashBtn_dbp ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "intermediate Obj" -command ("as_delImobj") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown node" -command ("as_delUnknown") ;
  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
 }else if($eSel==1){
@@ -127,9 +127,9 @@ if($ctx=="artAttrSkinContext"){
   shelfButton -style "textOnly" -label "rotate" -height 35 -noDefaultPopup -command ("as_transValue({0},1,0)") ;
   shelfButton -style "textOnly" -label "scale" -height 35 -noDefaultPopup -command ("as_transValue({0},0,1)") ;
   setParent ..;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -command ("asMatrixCons") ashb_mc ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -command ("as_matrixCons") ashb_mc ;
   popupMenu -parent ashb_mc ;
-  menuItem -label "Matrix Match Space" -command ("asMatrixSpace;asMatrixCons;") ;
+  menuItem -label "Matrix Match Space" -command ("as_matrixSpace; as_matrixCons;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "poleVectorConstraint.png" -label "Pole Vector" -command ("poleVectorConstraint -weight 1") ;
 }
 
@@ -193,16 +193,20 @@ window -title "Grid of Show" -titleBar 0 -resizeToFitChildren on win_GoS ;
 gridLayout -numberOfColumns 6 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
 $asfw = `getPanel -withFocus` ;
 global int $meJo ;
-iconTextButton -style "textOnly" -label "poly\ncount" -c ("TogglePolyCount;") ashk_pc ;
- popupMenu -parent ashk_pc ; menuItem -label "reset UI Position" -command ("as_resetUiPos()") ;
-iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashk_sfr ;
- popupMenu -parent ashk_sfr ; menuItem -label "abc Range" -command ("as_abcRange") ;
+iconTextButton -style "textOnly" -label "poly\ncount" -c ("TogglePolyCount") ashb_pc ;
+ popupMenu -parent ashb_pc ;
+ menuItem -label "reset UI Position" -command ("as_resetUiPos()") ;
+iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashb_sfr ;
+ popupMenu -parent ashb_sfr ;
+ menuItem -label "abc Range" -command ("as_abcRange") ;
 iconTextButton -style "textOnly" -label "joint" -c ("if($meJo==0){ modelEditor -e -joints 1 modelPanel4; $meJo=1; } else { modelEditor -e -joints 0 modelPanel4; $meJo=0; }") ;
-iconTextButton -style "textOnly" -label "farClip" -c ("as_nfClip(0)") ashk_clip ;
- popupMenu -parent ashk_clip ; menuItem -label "x 0.1" -command ("as_nfClip(1)") ;
+iconTextButton -style "textOnly" -label "farClip" -c ("as_nfClip(0)") ashb_clip ;
+ popupMenu -parent ashb_clip ;
+ menuItem -label "x 0.1" -command ("as_nfClip(1)") ;
 iconTextButton -style "textOnly" -label "show\nall" -c ("modelEditor -e -allObjects 1 "+$asfw) ;
-iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true -strokes true "+$asfw) ashk_cView ;
- popupMenu -parent ashk_cView ; menuItem -label "No Strokes" -command ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true "+$asfw) ;
+iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true -strokes true "+$asfw) ashb_cView ;
+ popupMenu -parent ashb_cView ;
+ menuItem -label "No Strokes" -command ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true "+$asfw) ;
 
 
 //==============================
@@ -219,22 +223,24 @@ iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObj
 window -title "Grid of Objects" -titleBar 0 -resizeToFitChildren on win_GoOs ;
 gridLayout -numberOfColumns 2 -cellWidthHeight 45 45 -bgc 0.21 0.21 0.2 ;
 
-iconTextButton -image1 "create.png" -c ("posLocator") -annotation "Locator at select transform." ;
-iconTextButton -image1 "toonToPolygons.png" -command ("asCopyPivot") -annotation "Copy Pivot." ashk_cp ;
-iconTextButton -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation "Create parent transform." ashk_cpt ;
- popupMenu -parent ashk_cpt ;
+iconTextButton -image1 "create.png" -c ("as_posLocator") -annotation "Locator at select transform." ;
+iconTextButton -image1 "toonToPolygons.png" -command ("as_copyPivot") -annotation "Copy Pivot." ashb_cp ;
+iconTextButton -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation "Create parent transform." ashb_cpt ;
+ popupMenu -parent ashb_cpt ;
  menuItem -label "ctrl_ ctrlTrans_" -command ("as_trans(\"ctrl_\",\"ctrlTrans_\")") ;
  menuItem -label "_ctrl _ctrlEnv" -command ("as_trans(\"_ctrl\",\"_ctrlEnv\")") ;
 iconTextButton -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
 iconTextButton -image1 "polyMerge.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
-iconTextButton -image1 "goToBindPose.png" -command ("putJoint") -annotation "Put a joint into selected transform." ;
-iconTextButton -image1 "kinJoint.png" -command ("$tr = `createNode transform` ; createNode -p $tr joint ; select -r $tr ; ") -annotation "Create joint and transform." ;
-iconTextButton -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashk_ikh ;
- popupMenu -parent ashk_ikh ;
+iconTextButton -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
+iconTextButton -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ;
+iconTextButton -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashb_ikh ;
+ popupMenu -parent ashb_ikh ;
  menuItem -label "spline IK Tool" -command ("IKSplineHandleToolOptions") ;
-iconTextButton -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ;
-iconTextButton -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashk_ai ;
- popupMenu -parent ashk_ai ;
+iconTextButton -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ashb_sbs ;
+ popupMenu -parent ashb_sbs ;
+ menuItem -label "Rebind" -command ("as_rebind") ;
+iconTextButton -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
+ popupMenu -parent ashb_ai ;
  menuItem -label "remove influence" -command ("RemoveInfluence") ;
 iconTextButton -image1 "blendShape.png" -c ("CreateBlendShape") -annotation "blendShape" ashb_bs ;
  popupMenu -parent ashb_bs ;
@@ -284,15 +290,15 @@ iconTextButton -image1 "nClothCacheCreate.png" -command ("nClothCache") -annotat
 window -title "Grid of Setting" -titleBar 0 -widthHeight 1000 10 -resizeToFitChildren on win_GoSet ;
 gridLayout -numberOfColumns 5 -cellWidthHeight 45 45 -bgc 0.22 0.2 0.2 ;
 
-iconTextButton -style "iconAndTextCentered" -image1 "setKeyframe.png" -label "" -command ("SetTestKey") ashb_testKey ;
+iconTextButton -style "iconAndTextCentered" -image1 "setKeyframe.png" -label "" -command ("as_setTestKey") ashb_testKey ;
  popupMenu -parent ashb_testKey ;
- menuItem -label "clean key" -c ("ashk_cleanKey(0)") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "AnimObj" -command ("ahk_animKey(\"obj\")") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "set\nAttr" -command ("attrZero(-1)") ashb_zero ;
+ menuItem -label "clean key" -c ("as_cleanKey(0)") ;
+iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "AnimObj" -command ("as_animKey(\"obj\")") ;
+iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "set\nAttr" -command ("as_attrZero(-1)") ashb_zero ;
  popupMenu -parent ashb_zero ;
- menuItem -label "round 2 decimal" -c ("attrZero(2)") ;
- menuItem -label "round 1 decimal" -c ("attrZero(1)") ;
- menuItem -label "round 0 decimal" -c ("attrZero(0)") ;
+ menuItem -label "round 2 decimal" -c ("as_attrZero(2)") ;
+ menuItem -label "round 1 decimal" -c ("as_attrZero(1)") ;
+ menuItem -label "round 0 decimal" -c ("as_attrZero(0)") ;
  menuItem -label "Zero Joint Orient" -c ("as_zeroJointOrient") ;
  menuItem -label "Zero Rotate (joint)" -c ("as_zeroJointRotate") ;
 iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "open\nAttr" -command ("as_attrDefault") ;
@@ -341,7 +347,6 @@ while($i<size($lsc)){
 
 
 //==============================
-
 $cx = 960 ;
 $cy = 540 ;
 if(`about -windows `){
@@ -353,8 +358,6 @@ if(`about -windows `){
  $cx = python("pt.x") ;
  $cy = python("pt.y") ;
 }
-
-//==============================
 
 $cpx = $cx - 150 ; $cpy = $cy - 170 ;
 windowPref -e -width 130 -height 150 -topLeftCorner $cpy $cpx win_ConsG ;
@@ -386,16 +389,7 @@ windowPref -e  -width 90 -topLeftCorner $cpy $cpx win_GoSet ;
 showWindow win_GoSet ;
 }
 
-
-//==============================
-
-
-global proc delConstrain(){
- $sl = ` ls -sl `; 
- $lr = ` listRelatives -children -type "constraint" $sl[size($sl)-1] ` ;
- delete $lr ;
-}
-
+//================ center block ==============
 
 global proc as_beConstraint(int $t,int $ro,int $s){
  $sl = ` ls -sl `; $sll = ` ls -l -sl `;
@@ -409,7 +403,65 @@ global proc as_beConstraint(int $t,int $ro,int $s){
 }
 
 
-global proc ahk_animKey(string $method){
+global proc as_selIoPut(int $method){
+ $sl = ` ls -selection -long ` ;
+ $cb = ` channelBox -q -selectedMainAttributes mainChannelBox ` ;
+ string $get[] ;
+ clear $get ;
+ for($x in $sl){
+  for($y in $cb){
+   if (`attributeExists $y $x`){
+    $s = ` listConnections -source 1 -destination 0 -skipConversionNodes 1  ($x+"."+$y) ` ;
+    $d = ` listConnections -source 0 -destination 1 -skipConversionNodes 1  ($x+"."+$y) ` ;
+    if($method==0) $get = stringArrayCatenate($get,$s) ;
+    if($method==1) $get = stringArrayCatenate($get,$d) ;
+   }
+  }
+ }
+ select -r $get ;
+}
+
+
+global proc as_constrainSource(){
+ $sel = `ls -selection -long` ;
+ $aList = {"translateX","translateY","translateZ","rotateX","rotateY","rotateZ","scaleX","scaleY","scaleZ"} ;
+ string $tList[] ; clear $tList ;
+ 
+ for($x in $sel){
+  for($a in $aList){
+   $lc = ` listConnections -source 1 -destination 0 -skipConversionNodes 1 -type "constraint" ($x+"."+$a) ` ;
+   if(size($lc)>0){
+    $lt = ` listConnections -source 1 -destination 0 -type "transform" -exactType 0 ($lc[0]+".target") ` ;
+    $tList[size($tList)] = $lt[0] ;
+   }
+  }
+ }
+ $tList = stringArrayRemoveDuplicates($tList) ;
+ select -r $tList ;
+}
+
+
+global proc as_delConstrain(){
+ $sl = ` ls -sl `; 
+ $lr = ` listRelatives -children -type "constraint" $sl[size($sl)-1] ` ;
+ delete $lr ;
+}
+
+
+global proc as_swapArtSkin(){
+ $r = ` artAttrCtx -q -useColorRamp artAttrSkinContext ` ;
+ $c = ` artAttrCtx -q -colorfeedback artAttrSkinContext ` ;
+ if($r==0&&$c==1){
+  artAttrCtx -e -useColorRamp 1 -colorfeedback 1 artAttrSkinContext ;
+ }else if($r==1&&$c==1){
+  artAttrCtx -e -useColorRamp 0 -colorfeedback 0 artAttrSkinContext ;
+ }else{
+  artAttrCtx -e -useColorRamp 0 -colorfeedback 1 artAttrSkinContext ;
+ }
+}
+
+
+global proc as_animKey(string $method){
  select -r `ls -type "animCurve"`;
  select -tgl `ls -type "animCurveUA"`;
  select -tgl `ls -type "animCurveUL"`;
@@ -428,18 +480,599 @@ global proc ahk_animKey(string $method){
 }
 
 
-global proc putJoint(){
- $sl = ` ls -sl ` ;
- $sll = ` ls -l -sl ` ;
+global proc as_sameName(){
+ $slnow = ` ls -long -sl ` ;
+ $sl = ` ls -dag` ;
+ select -cl ;
  $i = 0 ;
  while($i<size($sl)){
-  $jn = ` createNode -name ($sl[$i]+"JT") joint -parent $sll[$i] ` ;
-  $i++;
+  string $ary[] ;
+  clear $ary ;
+  $ary = stringToStringArray($sl[$i], "|");
+  if(size($ary)>1) select -tgl $sl[$i] ;
+   $i++;
+ }
+ $s = size(`ls -sl`);
+ if($s==0){
+  print "Have no same name nodes." ;
+  select $slnow ;
+ }else{
+  warning ("There are "+$s+" have same name.") ;
  }
 }
 
 
-global proc SetTestKey(){
+global proc as_delPose(){
+ $bp = ` ls -type dagPose ` ;
+ delete ` ls -type dagPose ` ;
+ $pm = "" ;
+ for($x in $bp) $pm = $pm + $x + " " ;
+ $pm = $pm + "been delete." ;
+ print $pm ;
+ nodeIconButton -e -enable 0 ashBtn_dbp ;
+}
+
+
+global proc as_turtleLayer(){
+ if(`pluginInfo -q -l "Turtle.mll"`){
+  unloadPlugin -f "Turtle.mll";
+  for($unk in `ls "Turtle*"`){lockNode -l 0 $unk;delete $unk;}
+ }
+}
+
+
+global proc as_delImobj(){
+ $mio = ` ls -intermediateObjects -type "mesh" -type "nurbsCurve" -type "nurbsSurface" ` ;
+ $i = 0 ;
+ while($i<size($mio)){
+  $lc = ` listConnections -skipConversionNodes true $mio[$i] ` ;
+  if(size($lc)!=0){ stringArrayRemoveAtIndex($i,$mio); $i--; }
+  $i++ ;
+ }
+ if(size($mio)==0){
+  print ("There are no disconnection intermediate objects.") ;
+ }else{
+  delete $mio ;
+  warning ("Delete " + size($mio) + " disconnection intermediate objects.") ;
+ }
+}
+
+
+global proc as_delUnknown(){
+ $ukn = ` ls -type unknown ` ;
+ for($x in $ukn){
+  $l = ` lockNode -q -lock $x ` ;
+  if($l[0]==1) lockNode -lock 0 $x ;
+  delete $x ;
+ }
+}
+
+
+global proc as_transValue(int $t[],int $ro,int $s){
+ $sl = `ls -selection -long` ;
+ if($t[0]==1){
+  setAttr ($sl[1]+".tx") (`getAttr ($sl[0]+".tx")`*$t[1]) ;
+  setAttr ($sl[1]+".ty") (`getAttr ($sl[0]+".ty")`*$t[2]) ;
+  setAttr ($sl[1]+".tz") (`getAttr ($sl[0]+".tz")`*$t[3]) ;
+ }
+ if($ro==1){
+  setAttr ($sl[1]+".rx") (`getAttr ($sl[0]+".rx")`) ;
+  setAttr ($sl[1]+".ry") (`getAttr ($sl[0]+".ry")`) ;
+  setAttr ($sl[1]+".rz") (`getAttr ($sl[0]+".rz")`) ;
+  if (`attributeExists "jointOrientX" $sl[1]`) setAttr ($sl[1]+".jointOrientX") (`getAttr ($sl[0]+".jointOrientX")`) ;
+  if (`attributeExists "jointOrientY" $sl[1]`) setAttr ($sl[1]+".jointOrientY") (`getAttr ($sl[0]+".jointOrientY")`) ;
+  if (`attributeExists "jointOrientZ" $sl[1]`) setAttr ($sl[1]+".jointOrientZ") (`getAttr ($sl[0]+".jointOrientZ")`) ;
+ }
+ if($s==1){
+  setAttr ($sl[1]+".sx") (`getAttr ($sl[0]+".sx")`) ;
+  setAttr ($sl[1]+".sy") (`getAttr ($sl[0]+".sy")`) ;
+  setAttr ($sl[1]+".sz") (`getAttr ($sl[0]+".sz")`) ;
+ }
+}
+
+
+global proc as_matrixCons(){
+ if(`pluginInfo -query -loaded matrixNodes`){
+ }else{ loadPlugin matrixNodes; }
+ 
+ $sl = ` ls -long -sl ` ;
+ if(size($sl)>=2){
+  $sl0a = stringToStringArray($sl[0], "|");
+  $sl0n = $sl0a[size($sl0a)-1] ;
+  
+  $dm = ("xCons_"+$sl0n) ;
+  $lc = ` listConnections -type decomposeMatrix ($sl[0]+".worldMatrix") ` ;
+  if(size($lc)>0) $dm = $lc[0] ;
+  else{
+   $dm = ` createNode -n ("xCons_"+$sl0n) -skipSelect decomposeMatrix ` ;
+   connectAttr -f ($sl[0]+".worldMatrix[0]") ($dm+".inputMatrix") ;
+  }
+  $i = 1 ;
+  while($i<size($sl)){
+   connectAttr ($dm+".outputTranslate") ($sl[$i]+".translate") ;
+   connectAttr ($dm+".outputRotate") ($sl[$i]+".rotate") ;
+   connectAttr ($dm+".outputScale") ($sl[$i]+".scale") ;
+   connectAttr ($dm+".outputShear") ($sl[$i]+".shear") ;
+  $i++;
+  }
+ }
+ select -r $sl ;
+ select -d $sl[0] ;
+}
+
+
+global proc as_matrixSpace(){
+ $sl = ` ls -sl ` ;
+ $sll = ` ls -l -sl ` ;
+ $i = 1 ;
+ while($i<size($sl)){
+  $ms = 0 ;
+  if(`getAttr -settable ($sll[$i]+".translateX")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".translateY")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".translateZ")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".rotateX")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".rotateY")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".rotateZ")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".scaleX")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".scaleY")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".scaleZ")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".shearXY")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".shearXZ")`) $ms++ ;
+  if(`getAttr -settable ($sll[$i]+".shearYZ")`) $ms++ ;
+  if($ms==12){
+   $p = ` listRelatives -parent $sll[$i] ` ;
+   parent $sll[$i] $sll[0] ;
+   $nsl = ` ls -sl -long ` ;
+   makeIdentity -apply 1 -translate 1 -rotate 1 -scale 1 $nsl[0] ;
+   if(size($p[0])==0) parent -world $nsl[0] ;
+   else parent $nsl[0] $p[0] ;
+   setAttr ($sll[$i]+".rotatePivotX") (`getAttr ($sll[0]+".rotatePivotX")`) ;
+   setAttr ($sll[$i]+".rotatePivotY") (`getAttr ($sll[0]+".rotatePivotY")`) ;
+   setAttr ($sll[$i]+".rotatePivotZ") (`getAttr ($sll[0]+".rotatePivotZ")`) ;
+   setAttr ($sll[$i]+".rotatePivotTranslateX") (`getAttr ($sll[0]+".rotatePivotTranslateX")`) ;
+   setAttr ($sll[$i]+".rotatePivotTranslateY") (`getAttr ($sll[0]+".rotatePivotTranslateY")`) ;
+   setAttr ($sll[$i]+".rotatePivotTranslateZ") (`getAttr ($sll[0]+".rotatePivotTranslateZ")`) ;
+   setAttr ($sll[$i]+".scalePivotX") (`getAttr ($sll[0]+".scalePivotX")`) ;
+   setAttr ($sll[$i]+".scalePivotY") (`getAttr ($sll[0]+".scalePivotY")`) ;
+   setAttr ($sll[$i]+".scalePivotZ") (`getAttr ($sll[0]+".scalePivotZ")`) ;
+   setAttr ($sll[$i]+".scalePivotTranslateX") (`getAttr ($sll[0]+".scalePivotTranslateX")`) ;
+   setAttr ($sll[$i]+".scalePivotTranslateY") (`getAttr ($sll[0]+".scalePivotTranslateY")`) ;
+   setAttr ($sll[$i]+".scalePivotTranslateZ") (`getAttr ($sll[0]+".scalePivotTranslateZ")`) ;
+  }else print ("Transform "+$sl[$i]+" 's attribute cann't settable.") ;
+  $i++;
+ }
+ select -r $sll ;
+}
+
+//================ upper right block ==============
+
+global proc as_selectInf(){
+ string $ja[] ;
+ clear $ja ;
+ $sl = ` ls -long -selection ` ;
+ for($x in $sl){
+  $j = ` skinCluster -q -inf $x ` ;
+  $ja = stringArrayCatenate($ja,$j) ;
+ }
+ $ja = stringArrayRemoveDuplicates($ja) ;
+ select -r $ja ;
+}
+
+//================ top block ==============
+
+global proc as_nfClip(int $n){
+ $fw = `getPanel -withFocus` ;
+ $cam = ` modelPanel -q -camera $fw ` ;
+ $camS = ` listRelatives -shapes $cam ` ;
+ $near = ` getAttr($camS[0]+".nearClipPlane") ` ;
+ $far = ` getAttr($camS[0]+".farClipPlane") ` ;
+ if($n==0){
+  $near = $near * 10 ;
+  $far = $far * 10 ;
+ }else if($n==1){
+  $near = $near * 0.1 ;
+  $far = $far * 0.1 ;
+ }
+ setAttr($camS[0]+".nearClipPlane",$near) ;
+ setAttr($camS[0]+".farClipPlane",$far) ;
+}
+
+global proc as_resetUiPos(){
+ python("lsUi = cmds.lsUI (windows=True)");
+ python("lsUi.remove('MayaWindow')");
+ python("lsUi.remove('win_ConsG')");
+ python("lsUi.remove('win_DeG')");
+ python("lsUi.remove('win_GoS')");
+ python("lsUi.remove('win_GoOs')");
+ python("lsUi.remove('win_GoSet')");
+ python("lsUi.remove('win_GoC')");
+ python("for x in lsUi : cmds.window(x,e=1,topLeftCorner=[100,100])");
+}
+
+global proc as_abcRange(){
+ $abc = ` ls -type "AlembicNode" ` ;
+ python("sf=[]") ; python("ef=[]") ;
+ if(size($abc)>0){
+  for($x in $abc){
+   python("sf.append(cmds.getAttr('"+$x+".startFrame'))");
+   python("ef.append(cmds.getAttr('"+$x+".endFrame'))");
+  }
+  $sf = python("min(sf)") ;
+  $ef = python("max(ef)") ;
+  playbackOptions -minTime $sf ;
+  playbackOptions -maxTime $ef ;
+ }
+}
+
+//================ left block ==============
+
+global proc as_copyPivot(){
+ $sl = ` ls -sl ` ;
+ $i = 1 ;
+ if(size($sl)>=2){
+  while($i<size($sl)){
+   $x= ` xform -q -worldSpace -rotatePivot $sl[0] ` ;
+   xform -worldSpace -rotatePivot $x[0] $x[1] $x[2] $sl[$i] ;
+   xform -worldSpace -scalePivot $x[0] $x[1] $x[2] $sl[$i] ;
+   $i++;
+  }
+ }else print "Select two or more transform." ;
+}
+
+global proc as_trans(string $so,string $sr){
+ $sl = ` ls -sl ` ;
+ $sll = ` ls -l -sl ` ;
+ $i = 0 ;
+ while($i<size($sl)){
+  $p = ` listRelatives -parent $sll[$i] ` ;
+  $tn = "trans_"+$sl[$i] ;
+  if($so!="" && $sr!=""){
+   string $si = $sl[$i] ;
+   $tn = `substitute $so $si $sr` ;
+  }
+  //if(startString($sl[$i],5) == "ctrl_"){
+  // $s = `size($sl[$i])` ;
+  // $e = endString($sl[$i],$s-5) ;
+  // $tn = ("ctrlTrans_"+$e) ;
+  //}
+  $t = ` createNode -name $tn -parent $sll[$i] transform ` ;
+  if(size($p)==0){
+   $pc = ` ls -l -assemblies ` ;
+   $j = 0 ;
+   while($j<size($pc) && $pc[$j]!=$sll[$i]) $j++ ;
+   parent -world $t ;
+   reorder -f $t ;
+   reorder -r $j ;
+  }else{
+   $pc = ` listRelatives -children -fullPath $p[0] ` ;
+   $j = 0 ;
+   while($j<size($pc) && $pc[$j]!=$sll[$i]) $j++ ;
+   parent $t $p[0] ;
+   reorder -f $t ;
+   reorder -r $j ;
+  }
+  parent $sll[$i] $t ;
+  $i++ ;
+}}
+
+global proc as_moveToLook(){
+ $fw = `getPanel -withFocus` ;
+ $cam = ` modelPanel -q -camera $fw ` ;
+ $sll = ` ls -l -sl ` ;
+ $t = ` createNode -parent $cam -skipSelect transform ` ;
+ setAttr ($t+".tz") -50 ;
+ matchTransform -position $sll[0] $t ;
+ delete $t ;
+}
+
+global proc as_createJoint(){
+ $sl = ` ls -sl ` ;
+ $sll = ` ls -l -sl ` ;
+ if(size($sll)==0){
+  $tr = `createNode transform` ;
+  createNode -p $tr joint ;
+  select -r $tr ; 
+ }else{
+  $i = 0 ;
+  while($i<size($sl)){
+   $jn = ` createNode -name ($sl[$i]+"JT") joint -parent $sll[$i] ` ;
+   $i++;
+  }
+ }
+}
+
+global proc as_posLocator(){
+ $sll = ` ls -l -sl ` ;
+ for($x in $sll){
+  $t = ` xform -q -translation -worldSpace $x ` ;
+  $loc = ` spaceLocator`  ;
+  move -absolute $t[0] $t[1] $t[2] $loc ;
+ }
+}
+
+global proc as_pureDupli(){
+ $sl = ` ls -selection -long ` ;
+ for($x in $sl){
+  $s = ` listRelatives -shapes $x ` ;
+  $ds = $s[0] ;
+  for($y in $s){
+   if(`getAttr ($y+".intermediateObject")`){
+     $ds = $y ;
+   }
+  }
+  $dr = ` duplicate $ds ` ;
+  if($ds!=$s[0]){
+   $ns = ` listRelatives -shapes $dr ` ;
+   int $ion = 0 ;
+   for($y in $ns){
+    if(`getAttr ($y+".intermediateObject")`){
+     setAttr ($y+".intermediateObject") 0 ;
+     sets -e -forceElement initialShadingGroup $y ;
+     $ra[0] = $y ;
+     $ns = stringArrayRemove($ra,$ns);
+     $ion++ ;
+    }
+   }
+   if($ion>0) delete $ns ;
+  }
+  select -r $dr ;
+ }
+}
+
+global proc as_duplucateConnect(){
+ $sl = ` ls -long -selection ` ;
+ string $dl[] ;
+ for($x in $sl){
+  $nt = ` nodeType $x `;
+  if($nt=="transform"){
+   $lr = ` listRelatives -shapes -fullPath -noIntermediate $x ` ;
+   $snt = ` nodeType $lr[0] `;
+   if($snt=="mesh"){
+    $d = ` polyDuplicateAndConnect $x ` ;
+    $dl[size($dl)] = $d[0] ;
+   }else if($snt=="nurbsCurve"){
+    $d = ` duplicate $x ` ;
+        $ds = ` listRelatives -shapes -fullPath -noIntermediate $d ` ;
+        connectAttr ($lr[0]+".worldSpace[0]") ($ds[0]+".create") ;
+    //$dl[size($dl)] = $d[0] ;
+   }
+  }else if($nt=="mesh"){
+   $d = ` polyDuplicateAndConnect $x ` ;
+   $dl[size($dl)] = $d[0] ;
+  }
+ }
+ select -replace $dl ;
+}
+
+global proc as_smoothBindSkin(){
+ $sl = ` ls -selection -long ` ;
+ string $jo[] ;
+ string $inf[] ;
+ string $geo[] ;
+ string $bdo[] ; // binded object
+ for($x in $sl){ 
+  $nt = ` nodeType $x ` ;
+  if($nt=="transform"){
+   $s = ` listRelatives -shapes -noIntermediate $x ` ;
+   if(size($s)>0){
+    $snt = ` nodeType $s[0] ` ;
+	if($snt=="mesh"||$snt=="nurbsCurve"||$snt=="nurbsSurface"){
+     $geo[size($geo)] = $s[0] ;
+     $bdo[size($bdo)] = $x ;
+	}
+	if($snt=="locator") $inf[size($inf)] = $x ;
+   }else{
+	$inf[size($inf)] = $x ;
+   }
+  }
+  if($nt=="joint") $jo[size($jo)] = $x ;
+ }
+ for($x in $geo){
+  if(size($jo)>0){
+   $sk = ` skinCluster -bindMethod 0 -dropoffRate 12.0 -maximumInfluences 4 -skinMethod 0 -toSelectedBones -ignoreBindPose -removeUnusedInfluence false -normalizeWeights 1 $jo $x ` ;
+   if(size($inf)>0) skinCluster -e -addInfluence $inf -weight 0 $sk ;
+  }
+  //-ignoreSelected -toSkeletonAndTransforms -toSelectedBones
+ }
+ if(size($geo)>0) select -replace $bdo ;
+}
+
+global proc as_rebind(){
+ $sl = ` ls -selection ` ;
+ $sll = ` ls -selection -long ` ;
+ $i = 0 ;
+ while($i<size($sl)){
+  $sk = ` findRelatedSkinCluster($sl[$i]) ` ;
+  setAttr ($sk+".envelope") 0 ;
+  duplicate -name "temporaryRebindModel" $sll[$i] ; 
+  $ski = ` skinCluster -q -influence $sk ` ;
+  $sk2 = ` skinCluster -toSelectedBones $ski "temporaryRebindModel" ` ;
+  copySkinWeights -ss $sk -ds $sk2 -influenceAssociation "name" -noMirror ; 
+  skinCluster -e -unbind $sll[$i] ;
+  delete ` ls -type "dagPose" ` ;
+  
+  python("idJo = {}") ;
+  string $nski[] ;
+  $j = 0 ;
+  while($j<size($ski)){
+   if (`attributeExists "orderID" $ski[$j]`){
+	$idv = ` getAttr ($ski[$j]+".orderID") ` ;
+	python("idJo['"+$ski[$j]+"'] = "+$idv+" ") ;
+   }else $nski[size($nski)] = $ski[$j] ;
+   $j++;
+  }
+  python("idJo = sorted(idJo.items(), key=lambda x:x[1])") ;
+  python("sIdJo = []") ;
+  python("for x in idJo : sIdJo.append(x[0])") ;
+  $sIdJo = python("sIdJo") ;
+  $nski = stringArrayCatenate($sIdJo,$nski);
+  
+  $sk3 = ` skinCluster -toSelectedBones $nski $sll[$i] ` ;
+  copySkinWeights -ss $sk2 -ds $sk3  -influenceAssociation "name" -noMirror ;
+  delete "temporaryRebindModel" ;
+  $i++;
+ }
+}
+
+global proc as_cluster(int $mode){
+ $ls = `ls -sl -fl` ;
+ $mn = stringToStringArray($ls[0],".[") ;
+ if(size($mn)<3){
+  if($mode==1) cluster -relative ;
+  if($mode==2) for($x in `ls -sl`) cluster -relative $x ;
+ }
+ else{
+  if(`softSelect -q -softSelectEnabled`) as_softCluster ;
+  else cluster -relative ;
+ }
+}
+
+global proc as_softCluster(){
+ python("import maya.OpenMaya as om");
+ 
+ python("selection = cmds.ls(sl=True)");
+ python("sel = selection[0].split('.')");
+ 
+ python("richSel = om.MRichSelection()");
+ python("om.MGlobal.getRichSelection(richSel)");
+ 
+ python("richSelList = om.MSelectionList()");
+ python("richSel.getSelection(richSelList)");
+ 
+ python("path = om.MDagPath()");
+ python("component = om.MObject()");
+ python("richSelList.getDagPath(0, path, component)");
+ python("componentFn = om.MFnSingleIndexedComponent(component)");
+ 
+ python("cluster = cmds.cluster( rel=True )");
+ python("cmds.setAttr(cluster[1]+'.rotate',lock=1)");
+ python("cmds.setAttr(cluster[1]+'.scale',lock=1)");
+ python("cmds.setAttr(cluster[1]+'.v',keyable=0,cb=1)");
+ python("clusterSet = cmds.listConnections( cluster, type=\"objectSet\" )");
+ 
+ python("for i in range(0,componentFn.elementCount()): weight = componentFn.weight(i); v = componentFn.element(i); w = weight.influence(); vtx = (sel[0]+'.vtx[%d]') % v; cmds.sets(vtx, add=clusterSet[0]); cmds.percent(cluster[0], vtx,  v=w ); ");
+ python("cmds.select(cluster[1])");
+}
+
+global proc as_reorderHistory(int $od){
+ $sl = ` ls -selection ` ;
+ for($x in $sl){
+  $his = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
+  reorderDeformers $his[$od] $his[$od-1] $x ;
+ }
+ select -replace $sl ;
+}
+
+global proc as_mirrorPoint(int $m){
+ $ls = `ls -selection -long` ;
+ if(size($ls)==1){
+  $s = ` listRelatives -shapes $ls[0] ` ;
+  if(size($s)==1){
+   $nt = ` nodeType $s[0] `;
+   if($nt=="mesh"){
+	$vn = ` polyEvaluate -vertex $s[0] ` ;
+	$i = 0 ;
+	while($i<$vn[0]){
+	 $v = $s[0] + ".vtx[" + $i + "]" ;
+	 $x = ` xform -q -objectSpace -t $v ` ;
+	 if($m==1) $x = ` xform -q -worldSpace -t $v ` ;
+	 if($m==0) xform -os -t ($x[0]*-1) $x[1] $x[2] $v ;
+	 if($m==1) xform -ws -t ($x[0]*-1) $x[1] $x[2] $v ;
+     $i++ ;
+	}
+   }
+  }
+ }else if(size($ls)==2){
+  $s0 = ` listRelatives -shapes $ls[0] ` ;
+  $s1 = ` listRelatives -shapes $ls[1] ` ;
+  if(size($s0)==1){
+   $nt = ` nodeType $s0[0] `;
+   print $nt ;
+   if($nt=="nurbsCurve"){
+	$vn = `getAttr ($s0[0]+".spans") ` + `getAttr ($s0[0]+".degree") ` ;
+	$i = 0 ;
+	while($i<$vn){
+     $v0 = $s0[0] + ".controlPoints[" + $i + "]" ;
+     $v1 = $s1[0] + ".controlPoints[" + $i + "]" ;
+	 $xv = getAttr ($v0+".xValue") ; $yv = getAttr ($v0+".yValue") ; $zv = getAttr ($v0+".zValue") ;
+	 setAttr ($v1+".xValue") ($xv*-1) ;
+	 setAttr ($v1+".yValue") $yv ;
+	 setAttr ($v1+".zValue") $zv ;
+     $i++ ;
+	}
+   }
+  }
+ }
+}
+
+global proc as_cancelImo(){
+ $sl = ` ls -selection ` ;
+ for($x in $sl){
+  if(`attributeExists "intermediateObject" $x`){
+   setAttr ($x+".intermediateObject",0) ;
+  }
+ }
+}
+
+global proc as_transMaterial(){
+ $sl = `ls -selection -long ` ;
+ $nt = ` nodeType $sl[0] ` ;
+ $sp = ` listRelatives -shapes -path $sl[0] ` ;
+ if(size($sp)>0) $nt = ` nodeType $sp[0] ` ;
+ if($nt=="mesh"||$nt=="nurbsSurface"){
+  $sg = ` listConnections -type shadingEngine $sp[0] ` ;
+  stringArrayRemoveAtIndex(0,$sl);
+  for($x in $sl) sets -e -forceElement $sg $x ; 
+ }else if($nt=="nurbsCurve"||$nt=="locator"){
+  $oe = ` getAttr ($sp[0]+".overrideEnabled") ` ;
+  $oi = ` getAttr ($sp[0]+".overrideColor") ` ;
+  $oc = ` getAttr ($sp[0]+".overrideRGBColors") ` ;
+  $or = ` getAttr ($sp[0]+".overrideColorR") ` ;
+  $og = ` getAttr ($sp[0]+".overrideColorG") ` ;
+  $ob = ` getAttr ($sp[0]+".overrideColorB") ` ;
+  for($x in $sl){
+   $tsp = ` listRelatives -shapes -path $x ` ;
+   for($y in $tsp){
+    print $y ;
+    setAttr ($y+".overrideEnabled") $oe ;
+    setAttr ($y+".overrideColor") $oi ;
+    setAttr ($y+".overrideRGBColors") $oc ;
+    setAttr ($y+".overrideColorR") $or ;
+    setAttr ($y+".overrideColorG") $og ;
+    setAttr ($y+".overrideColorB") $ob ;
+   }
+  }
+ }else if($nt=="joint"){
+  $oe = ` getAttr ($sl[0]+".overrideEnabled") ` ;
+  $oi = ` getAttr ($sl[0]+".overrideColor") ` ;
+  $oc = ` getAttr ($sl[0]+".overrideRGBColors") ` ;
+  $or = ` getAttr ($sl[0]+".overrideColorR") ` ;
+  $og = ` getAttr ($sl[0]+".overrideColorG") ` ;
+  $ob = ` getAttr ($sl[0]+".overrideColorB") ` ;
+  for($x in $sl){
+   setAttr ($x+".overrideEnabled") $oe ;
+   setAttr ($x+".overrideColor") $oi ;
+   setAttr ($x+".overrideRGBColors") $oc ;
+   setAttr ($x+".overrideColorR") $or ;
+   setAttr ($x+".overrideColorG") $og ;
+   setAttr ($x+".overrideColorB") $ob ;
+  }
+ }
+}
+
+global proc as_setOrigBsKey(){
+ $sl = ` ls -selection ` ;
+ $bs = blendShape($sl[0],$sl[1]) ;
+ $attr = $bs[0]+"."+$sl[0] ;
+ $ti = ` playbackOptions -q -minTime ` ;
+ $ta = ` playbackOptions -q -maxTime ` ;
+ setKeyframe -time $ti -value 1 $attr ;
+ setKeyframe -time $ta -value 0 $attr ;
+}
+
+//================ right block ==============
+
+global proc as_setTestKey(){
  $sl = ` ls -sl ` ;
  $ti = ` playbackOptions -q -minTime ` ;
  $ta = ` playbackOptions -q -maxTime ` ;
@@ -473,9 +1106,7 @@ global proc SetTestKey(){
  currentTime $ta ;
 }
 
-
-
-global proc attrZero(int $method){
+global proc as_attrZero(int $method){
  $sl = ` ls -l -sl ` ;
  $i = 0 ; 
  while($i<size($sl)){
@@ -530,15 +1161,13 @@ global proc attrZero(int $method){
  }
 }
 
-
-global proc ashk_cleanKey(int $method){
+global proc as_cleanKey(int $method){
  $sl = ` ls -selection -objectsOnly ` ;
  for($x in $sl){
   $ac = ` listConnections -source 1 -destination 0 -type animCurve $x ` ;
   for($y in $ac) delete($y) ;
  }
 }
-
 
 global proc as_attrDefault(){
  $sl = ` ls -l -sl ` ;
@@ -551,22 +1180,21 @@ global proc as_attrDefault(){
  }
 }
 
-
-
-
-global proc asCopyPivot(){
- $sl = ` ls -sl ` ;
- $i = 1 ;
- if(size($sl)>=2){
-  while($i<size($sl)){
-   $x= ` xform -q -worldSpace -rotatePivot $sl[0] ` ;
-   xform -worldSpace -rotatePivot $x[0] $x[1] $x[2] $sl[$i] ;
-   xform -worldSpace -scalePivot $x[0] $x[1] $x[2] $sl[$i] ;
-   $i++;
+global proc as_zeroJointRotate(){
+ $ls = `ls -sl` ;
+ for($x in $ls){
+  $nt = ` nodeType $x ` ;
+  if($nt=="joint"){
+   $p = ` listRelatives -parent $x ` ;
+   $temp = ` createNode -skipSelect -parent $p[0] "transform" ` ;
+   matchTransform $temp $x ;
+   $ro = `getAttr ($temp+".rotate") ` ;
+   setAttr ($x+".jointOrient") $ro[0] $ro[1] $ro[2] ;
+   setAttr ($x+".rotate") 0 0 0 ;
+   delete $temp ;
   }
- }else print "Select two or more transform." ;
+ }
 }
-
 
 global proc asLockAttr(){
  $sl = ` ls -sl ` ; $i = 0 ;
@@ -585,7 +1213,6 @@ global proc asLockAttr(){
  }
 }
 
-
 global proc asLockPreferOrient(){
  $sl = ` ls -sl ` ; $i = 0 ;
  while($i<size($sl)){
@@ -596,345 +1223,20 @@ global proc asLockPreferOrient(){
  }
 }
 
-
-global proc posLocator(){
- $sll = ` ls -l -sl ` ;
- for($x in $sll){
-  $t = ` xform -q -translation -worldSpace $x ` ;
-  $loc = ` spaceLocator`  ;
-  move -absolute $t[0] $t[1] $t[2] $loc ;
- }
-}
-
-
-global proc constrainSource(){
- $sel = `ls -sl` ;
- $aList = {"translateX","translateY","translateZ","rotateX","rotateY","rotateZ","scaleX","scaleY","scaleZ"} ;
- string $tList[] ; clear $tList ;
- 
- for($x in $sel){
-  for($a in $aList){
-   $lc = ` listConnections -source 1 -destination 0 -skipConversionNodes 1 -type "constraint" ($x+"."+$a) ` ;
-   if(size($lc)>0){
-    $lt = ` listConnections -source 1 -destination 0 -type "transform" -exactType 0 ($lc[0]+".target") ` ;
-    $tList[size($tList)] = $lt[0] ;
-   }
-  }
- }
- $tList = stringArrayRemoveDuplicates($tList) ;
- select -r $tList ;
-}
-
-
-global proc constrainSourceOld(){
- $xl = `ls -sl` ;
- string $po[] ; clear $po ;
- $i = 0 ;
- while($i<size($xl)){
-  $lr = ` listRelatives -type "constraint" $xl[$i] ` ;
-  $j = 0 ;
-  while($j<size($lr)){
-  $lt = ` listConnections -s 1 -d 0 -type "transform" -exactType 0 ($lr[$j]+".target") ` ;
-  $lt = stringArrayRemoveDuplicates($lt);
-  $lt = stringArrayRemove($lr,$lt);
-  $po = stringArrayCatenate($lt,$po);
-  $j++ ;
-  }
-  $i++;
- }
- select -r $po ;
-}
-
-
-global proc as_vertexWeightCheckUI(){
- $sl = ` ls -fl -sl ` ;
- $array = stringToStringArray($sl[0],".");
- $sk = findRelatedSkinCluster($array[0]) ;
- string $aInf[] ; clear $aInf ;
- float $aInfW[] ; clear $aInfW ;
- if($sk!=""){
-  $inf = ` skinCluster -q -inf $sk ` ;
-  $sw = ` skinPercent -q -value $sk $sl[0] ` ;
-  $i = 0 ;
-  while($i<size($sw)){
-   if($sw[$i]>0.0004){
-    $aInf[size($aInf)] = $inf[$i] ;
-    $sw[$i] = $sw[$i]*1000 ;
-    $aInfW[size($aInfW)] = int($sw[$i]) *0.001 ;
-   }
-   $i++;
-  } 
-  if(`window -exists vwcw_Win`) deleteUI -window vwcw_Win ;
-  window -title "Vertex Weight Check Window" -resizeToFitChildren on vwcw_Win ;
-  formLayout MainForm ;
-  button -label $sl[0] -command ("select -r "+$sl[0]) btn_SS ;
-  separator sprt1 ;
-  formLayout -edit
-  -af btn_SS "top" 3
-  -af btn_SS "left" 5
-  -af btn_SS "right" 5
-  -ac sprt1 "top" 1 btn_SS
-  -af sprt1 "left" 5
-  -af sprt1 "right" 5 MainForm;
-  $i = 0 ;
-  while($i<size($aInf)){
-   button -label ($aInf[$i]+" ("+$aInfW[$i]+")") -height 30 -command ("select -r "+$aInf[$i]) ("btn_S"+$i) ;
-   if($i==0) formLayout -edit -ac ("btn_S"+$i) "top" 3 sprt1 MainForm ;
-   else formLayout -edit -ac ("btn_S"+$i) "top" 3 ("btn_S"+($i-1)) MainForm ;
-   formLayout -edit  -af ("btn_S"+$i) "left" 5  -af ("btn_S"+$i) "right" 5 MainForm;
-   $i++ ;
-  }
-  int $wh = 35 + size($aInf) *33 ;
-  window -e -widthHeight 200 $wh vwcw_Win ;
-  showWindow vwcw_Win ;
- }else{
-  warning "Need to select vertex with skinCluster." ;
- }
-}
-
-
-global proc asMatrixCons(){
- if(`pluginInfo -query -loaded matrixNodes`){
- }else{ loadPlugin matrixNodes; }
- 
- $sl = ` ls -long -sl ` ;
- if(size($sl)>=2){
-  $sl0a = stringToStringArray($sl[0], "|");
-  $sl0n = $sl0a[size($sl0a)-1] ;
-  
-  $dm = ("xCons_"+$sl0n) ;
-  $lc = ` listConnections -type decomposeMatrix ($sl[0]+".worldMatrix") ` ;
-  if(size($lc)>0) $dm = $lc[0] ;
-  else{
-   $dm = ` createNode -n ("xCons_"+$sl0n) -skipSelect decomposeMatrix ` ;
-   connectAttr -f ($sl[0]+".worldMatrix[0]") ($dm+".inputMatrix") ;
-  }
-  $i = 1 ;
-  while($i<size($sl)){
-   connectAttr ($dm+".outputTranslate") ($sl[$i]+".translate") ;
-   connectAttr ($dm+".outputRotate") ($sl[$i]+".rotate") ;
-   connectAttr ($dm+".outputScale") ($sl[$i]+".scale") ;
-   connectAttr ($dm+".outputShear") ($sl[$i]+".shear") ;
-  $i++;
-  }
- }
- select -r $sl ;
- select -d $sl[0] ;
-}
-
-
-global proc asMatrixSpace(){
- $sl = ` ls -sl ` ;
- $sll = ` ls -l -sl ` ;
- $i = 1 ;
- while($i<size($sl)){
-  $ms = 0 ;
-  if(`getAttr -settable ($sll[$i]+".translateX")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".translateY")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".translateZ")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".rotateX")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".rotateY")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".rotateZ")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".scaleX")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".scaleY")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".scaleZ")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".shearXY")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".shearXZ")`) $ms++ ;
-  if(`getAttr -settable ($sll[$i]+".shearYZ")`) $ms++ ;
-  if($ms==12){
-   $p = ` listRelatives -parent $sll[$i] ` ;
-   parent $sll[$i] $sll[0] ;
-   $nsl = ` ls -sl -long ` ;
-   makeIdentity -apply 1 -translate 1 -rotate 1 -scale 1 $nsl[0] ;
-   if(size($p[0])==0) parent -world $nsl[0] ;
-   else parent $nsl[0] $p[0] ;
-   setAttr ($sll[$i]+".rotatePivotX") (`getAttr ($sll[0]+".rotatePivotX")`) ;
-   setAttr ($sll[$i]+".rotatePivotY") (`getAttr ($sll[0]+".rotatePivotY")`) ;
-   setAttr ($sll[$i]+".rotatePivotZ") (`getAttr ($sll[0]+".rotatePivotZ")`) ;
-   setAttr ($sll[$i]+".rotatePivotTranslateX") (`getAttr ($sll[0]+".rotatePivotTranslateX")`) ;
-   setAttr ($sll[$i]+".rotatePivotTranslateY") (`getAttr ($sll[0]+".rotatePivotTranslateY")`) ;
-   setAttr ($sll[$i]+".rotatePivotTranslateZ") (`getAttr ($sll[0]+".rotatePivotTranslateZ")`) ;
-   setAttr ($sll[$i]+".scalePivotX") (`getAttr ($sll[0]+".scalePivotX")`) ;
-   setAttr ($sll[$i]+".scalePivotY") (`getAttr ($sll[0]+".scalePivotY")`) ;
-   setAttr ($sll[$i]+".scalePivotZ") (`getAttr ($sll[0]+".scalePivotZ")`) ;
-   setAttr ($sll[$i]+".scalePivotTranslateX") (`getAttr ($sll[0]+".scalePivotTranslateX")`) ;
-   setAttr ($sll[$i]+".scalePivotTranslateY") (`getAttr ($sll[0]+".scalePivotTranslateY")`) ;
-   setAttr ($sll[$i]+".scalePivotTranslateZ") (`getAttr ($sll[0]+".scalePivotTranslateZ")`) ;
-  }else print ("Transform "+$sl[$i]+" 's attribute cann't settable.") ;
-  $i++;
- }
- select -r $sll ;
-}
-
-
-global proc as_trans(string $so,string $sr){
- $sl = ` ls -sl ` ;
- $sll = ` ls -l -sl ` ;
- $i = 0 ;
- while($i<size($sl)){
-  $p = ` listRelatives -parent $sll[$i] ` ;
-  $tn = "trans_"+$sl[$i] ;
-  if($so!="" && $sr!=""){
-   string $si = $sl[$i] ;
-   $tn = `substitute $so $si $sr` ;
-  }
-  //if(startString($sl[$i],5) == "ctrl_"){
-  // $s = `size($sl[$i])` ;
-  // $e = endString($sl[$i],$s-5) ;
-  // $tn = ("ctrlTrans_"+$e) ;
-  //}
-  $t = ` createNode -name $tn -parent $sll[$i] transform ` ;
-  if(size($p)==0){
-   $pc = ` ls -l -assemblies ` ;
-   $j = 0 ;
-   while($j<size($pc) && $pc[$j]!=$sll[$i]) $j++ ;
-   parent -world $t ;
-   reorder -f $t ;
-   reorder -r $j ;
-  }else{
-   $pc = ` listRelatives -children -fullPath $p[0] ` ;
-   $j = 0 ;
-   while($j<size($pc) && $pc[$j]!=$sll[$i]) $j++ ;
-   parent $t $p[0] ;
-   reorder -f $t ;
-   reorder -r $j ;
-  }
-  parent $sll[$i] $t ;
-  $i++ ;
- }
-}
-
-
-global proc as_duplucateConnect(){
- $sl = ` ls -long -selection ` ;
- string $dl[] ;
- for($x in $sl){
-  $nt = ` nodeType $x `;
-  if($nt=="transform"){
-   $lr = ` listRelatives -shapes -fullPath -noIntermediate $x ` ;
-   $snt = ` nodeType $lr[0] `;
-   if($snt=="mesh"){
-    $d = ` polyDuplicateAndConnect $x ` ;
-    $dl[size($dl)] = $d[0] ;
-   }else if($snt=="nurbsCurve"){
-    $d = ` duplicate $x ` ;
-        $ds = ` listRelatives -shapes -fullPath -noIntermediate $d ` ;
-        connectAttr ($lr[0]+".worldSpace[0]") ($ds[0]+".create") ;
-    //$dl[size($dl)] = $d[0] ;
-   }
-  }else if($nt=="mesh"){
-   $d = ` polyDuplicateAndConnect $x ` ;
-   $dl[size($dl)] = $d[0] ;
-  }
- }
- select -replace $dl ;
-}
-
-
-global proc as_delPose(){
- $bp = ` ls -type dagPose ` ;
- delete ` ls -type dagPose ` ;
- $pm = "" ;
- for($x in $bp) $pm = $pm + $x + " " ;
- $pm = $pm + "been delete." ;
- print $pm ;
- nodeIconButton -e -enable 0 ashBtn_dbp ;
-}
-
-
-global proc as_delImobj(){
- $mio = ` ls -intermediateObjects -type "mesh" -type "nurbsCurve" -type "nurbsSurface" ` ;
- $i = 0 ;
- while($i<size($mio)){
-  $lc = ` listConnections -skipConversionNodes true $mio[$i] ` ;
-  if(size($lc)!=0){ stringArrayRemoveAtIndex($i,$mio); $i--; }
-  $i++ ;
- }
- if(size($mio)==0){
-  print ("There are no disconnection intermediate objects.") ;
- }else{
-  delete $mio ;
-  warning ("Delete " + size($mio) + " disconnection intermediate objects.") ;
- }
-}
-
-
-global proc as_turtleLayer(){
- if(`pluginInfo -q -l "Turtle.mll"`){
-  unloadPlugin -f "Turtle.mll";
-  for($unk in `ls "Turtle*"`){lockNode -l 0 $unk;delete $unk;}
- }
-}
-
-
-global proc as_sameName(){
- $slnow = ` ls -long -sl ` ;
- $sl = ` ls -dag` ;
- select -cl ;
- $i = 0 ;
- while($i<size($sl)){
-  string $ary[] ;
-  clear $ary ;
-  $ary = stringToStringArray($sl[$i], "|");
-  if(size($ary)>1) select -tgl $sl[$i] ;
-   $i++;
- }
- $s = size(`ls -sl`);
- if($s==0){
-  print "Have no same name nodes." ;
-  select $slnow ;
- }else{
-  warning ("There are "+$s+" have same name.") ;
- }
-}
-
-
-global proc as_transMaterial(){
- $sl = `ls -selection -long ` ;
- $nt = ` nodeType $sl[0] ` ;
- $sp = ` listRelatives -shapes -path $sl[0] ` ;
- if(size($sp)>0) $nt = ` nodeType $sp[0] ` ;
- if($nt=="mesh"||$nt=="nurbsSurface"){
-  $sg = ` listConnections -type shadingEngine $sp[0] ` ;
-  stringArrayRemoveAtIndex(0,$sl);
-  for($x in $sl) sets -e -forceElement $sg $x ; 
- }else if($nt=="nurbsCurve"||$nt=="locator"){
-  $oe = ` getAttr ($sp[0]+".overrideEnabled") ` ;
-  $oi = ` getAttr ($sp[0]+".overrideColor") ` ;
-  $oc = ` getAttr ($sp[0]+".overrideRGBColors") ` ;
-  $or = ` getAttr ($sp[0]+".overrideColorR") ` ;
-  $og = ` getAttr ($sp[0]+".overrideColorG") ` ;
-  $ob = ` getAttr ($sp[0]+".overrideColorB") ` ;
-  for($x in $sl){
-   $tsp = ` listRelatives -shapes -path $x ` ;
-   for($y in $tsp){
-print $y ;
-    setAttr ($y+".overrideEnabled") $oe ;
-    setAttr ($y+".overrideColor") $oi ;
-    setAttr ($y+".overrideRGBColors") $oc ;
-    setAttr ($y+".overrideColorR") $or ;
-    setAttr ($y+".overrideColorG") $og ;
-    setAttr ($y+".overrideColorB") $ob ;
-   }
-  }
- }else if($nt=="joint"){
-  $oe = ` getAttr ($sl[0]+".overrideEnabled") ` ;
-  $oi = ` getAttr ($sl[0]+".overrideColor") ` ;
-  $oc = ` getAttr ($sl[0]+".overrideRGBColors") ` ;
-  $or = ` getAttr ($sl[0]+".overrideColorR") ` ;
-  $og = ` getAttr ($sl[0]+".overrideColorG") ` ;
-  $ob = ` getAttr ($sl[0]+".overrideColorB") ` ;
-  for($x in $sl){
-   setAttr ($x+".overrideEnabled") $oe ;
-   setAttr ($x+".overrideColor") $oi ;
-   setAttr ($x+".overrideRGBColors") $oc ;
-   setAttr ($x+".overrideColorR") $or ;
-   setAttr ($x+".overrideColorG") $og ;
-   setAttr ($x+".overrideColorB") $ob ;
+global proc as_zeroJointOrient(){
+ $ls = `ls -sl` ;
+ for($x in $ls){
+  $nt = ` nodeType $x ` ;
+  if($nt=="joint"){
+   $temp = ` createNode -skipSelect "transform" ` ;
+   matchTransform $temp $x ;
+   $ot = ` orientConstraint $temp $x ` ;
+   setAttr ($x+".jointOrient") 0 0 0 ;
+   delete $ot ;
+   delete $temp ;
   }
  }
 }
-
 
 global proc as_quickExIm(int $i){
  $dir = ` whatIs asueiHotbox ` ;
@@ -1000,339 +1302,51 @@ global proc as_skinWeightExIm(int $m){
  print $dir ;
 }
 
-global proc as_selectInf(){
- string $ja[] ;
- clear $ja ;
- $sl = ` ls -long -selection ` ;
- for($x in $sl){
-  $j = ` skinCluster -q -inf $x ` ;
-  $ja = stringArrayCatenate($ja,$j) ;
- }
- $ja = stringArrayRemoveDuplicates($ja) ;
- select -r $ja ;
-}
+//================ UI block ==============
 
-
-global proc as_pureDupli(){
- $sl = ` ls -selection -long ` ;
- for($x in $sl){
-  $s = ` listRelatives -shapes $x ` ;
-  $ds = $s[0] ;
-  for($y in $s){
-   if(`getAttr ($y+".intermediateObject")`){
-     $ds = $y ;
+global proc as_vertexWeightCheckUI(){
+ $sl = ` ls -fl -sl ` ;
+ $array = stringToStringArray($sl[0],".");
+ $sk = findRelatedSkinCluster($array[0]) ;
+ string $aInf[] ; clear $aInf ;
+ float $aInfW[] ; clear $aInfW ;
+ if($sk!=""){
+  $inf = ` skinCluster -q -inf $sk ` ;
+  $sw = ` skinPercent -q -value $sk $sl[0] ` ;
+  $i = 0 ;
+  while($i<size($sw)){
+   if($sw[$i]>0.0004){
+    $aInf[size($aInf)] = $inf[$i] ;
+    $sw[$i] = $sw[$i]*1000 ;
+    $aInfW[size($aInfW)] = int($sw[$i]) *0.001 ;
    }
+   $i++;
+  } 
+  if(`window -exists vwcw_Win`) deleteUI -window vwcw_Win ;
+  window -title "Vertex Weight Check Window" -resizeToFitChildren on vwcw_Win ;
+  formLayout MainForm ;
+  button -label $sl[0] -command ("select -r "+$sl[0]) btn_SS ;
+  separator sprt1 ;
+  formLayout -edit
+  -af btn_SS "top" 3
+  -af btn_SS "left" 5
+  -af btn_SS "right" 5
+  -ac sprt1 "top" 1 btn_SS
+  -af sprt1 "left" 5
+  -af sprt1 "right" 5 MainForm;
+  $i = 0 ;
+  while($i<size($aInf)){
+   button -label ($aInf[$i]+" ("+$aInfW[$i]+")") -height 30 -command ("select -r "+$aInf[$i]) ("btn_S"+$i) ;
+   if($i==0) formLayout -edit -ac ("btn_S"+$i) "top" 3 sprt1 MainForm ;
+   else formLayout -edit -ac ("btn_S"+$i) "top" 3 ("btn_S"+($i-1)) MainForm ;
+   formLayout -edit  -af ("btn_S"+$i) "left" 5  -af ("btn_S"+$i) "right" 5 MainForm;
+   $i++ ;
   }
-  $dr = ` duplicate $ds ` ;
-  if($ds!=$s[0]){
-   $ns = ` listRelatives -shapes $dr ` ;
-   int $ion = 0 ;
-   for($y in $ns){
-    if(`getAttr ($y+".intermediateObject")`){
-     setAttr ($y+".intermediateObject") 0 ;
-     sets -e -forceElement initialShadingGroup $y ;
-     $ra[0] = $y ;
-     $ns = stringArrayRemove($ra,$ns);
-     $ion++ ;
-    }
-   }
-   if($ion>0) delete $ns ;
-  }
-  select -r $dr ;
- }
-}
-
-
-global proc as_smoothBindSkin(){
- $sl = ` ls -selection -long ` ;
- string $jo[] ;
- string $inf[] ;
- string $geo[] ;
- string $bdo[] ; // binded object
- for($x in $sl){ 
-  $nt = ` nodeType $x ` ;
-  if($nt=="transform"){
-   $s = ` listRelatives -shapes -noIntermediate $x ` ;
-   if(size($s)>0){
-    $snt = ` nodeType $s[0] ` ;
-	if($snt=="mesh"||$snt=="nurbsCurve"||$snt=="nurbsSurface"){
-     $geo[size($geo)] = $s[0] ;
-     $bdo[size($bdo)] = $x ;
-	}
-	if($snt=="locator") $inf[size($inf)] = $x ;
-   }else{
-	$inf[size($inf)] = $x ;
-   }
-  }
-  if($nt=="joint") $jo[size($jo)] = $x ;
- }
- for($x in $geo){
-  if(size($jo)>0){
-   $sk = ` skinCluster -bindMethod 0 -dropoffRate 12.0 -maximumInfluences 4 -skinMethod 0 -toSelectedBones -ignoreBindPose -removeUnusedInfluence false -normalizeWeights 1 $jo $x ` ;
-   if(size($inf)>0) skinCluster -e -addInfluence $inf -weight 0 $sk ;
-  }
-  //-ignoreSelected -toSkeletonAndTransforms -toSelectedBones
- }
- if(size($geo)>0) select -replace $bdo ;
-}
-
-
-global proc as_delUnknown(){
- $ukn = ` ls -type unknown ` ;
- for($x in $ukn){
-  $l = ` lockNode -q -lock $x ` ;
-  if($l[0]==1) lockNode -lock 0 $x ;
-  delete $x ;
- }
-}
-
-
-global proc as_transValue(int $t[],int $ro,int $s){
- $sl = `ls -selection -long` ;
- if($t[0]==1){
-  setAttr ($sl[1]+".tx") (`getAttr ($sl[0]+".tx")`*$t[1]) ;
-  setAttr ($sl[1]+".ty") (`getAttr ($sl[0]+".ty")`*$t[2]) ;
-  setAttr ($sl[1]+".tz") (`getAttr ($sl[0]+".tz")`*$t[3]) ;
- }
- if($ro==1){
-  setAttr ($sl[1]+".rx") (`getAttr ($sl[0]+".rx")`) ;
-  setAttr ($sl[1]+".ry") (`getAttr ($sl[0]+".ry")`) ;
-  setAttr ($sl[1]+".rz") (`getAttr ($sl[0]+".rz")`) ;
-  if (`attributeExists "jointOrientX" $sl[1]`) setAttr ($sl[1]+".jointOrientX") (`getAttr ($sl[0]+".jointOrientX")`) ;
-  if (`attributeExists "jointOrientY" $sl[1]`) setAttr ($sl[1]+".jointOrientY") (`getAttr ($sl[0]+".jointOrientY")`) ;
-  if (`attributeExists "jointOrientZ" $sl[1]`) setAttr ($sl[1]+".jointOrientZ") (`getAttr ($sl[0]+".jointOrientZ")`) ;
- }
- if($s==1){
-  setAttr ($sl[1]+".sx") (`getAttr ($sl[0]+".sx")`) ;
-  setAttr ($sl[1]+".sy") (`getAttr ($sl[0]+".sy")`) ;
-  setAttr ($sl[1]+".sz") (`getAttr ($sl[0]+".sz")`) ;
- }
-}
-
-
-global proc as_selIoPut(int $method){
- $sl = ` ls -selection -long ` ;
- $cb = ` channelBox -q -selectedMainAttributes mainChannelBox ` ;
- string $get[] ;
- clear $get ;
- for($x in $sl){
-  for($y in $cb){
-   if (`attributeExists $y $x`){
-    $s = ` listConnections -source 1 -destination 0 -skipConversionNodes 1  ($x+"."+$y) ` ;
-    $d = ` listConnections -source 0 -destination 1 -skipConversionNodes 1  ($x+"."+$y) ` ;
-    if($method==0) $get = stringArrayCatenate($get,$s) ;
-    if($method==1) $get = stringArrayCatenate($get,$d) ;
-   }
-  }
- }
- select -r $get ;
-}
-
-
-global proc as_setOrigBsKey(){
- $sl = ` ls -selection ` ;
- $bs = blendShape($sl[0],$sl[1]) ;
- $attr = $bs[0]+"."+$sl[0] ;
- $ti = ` playbackOptions -q -minTime ` ;
- $ta = ` playbackOptions -q -maxTime ` ;
- setKeyframe -time $ti -value 1 $attr ;
- setKeyframe -time $ta -value 0 $attr ;
-}
-
-
-global proc as_swapArtSkin(){
- $r = ` artAttrCtx -q -useColorRamp artAttrSkinContext ` ;
- $c = ` artAttrCtx -q -colorfeedback artAttrSkinContext ` ;
- if($r==0&&$c==1){
-  artAttrCtx -e -useColorRamp 1 -colorfeedback 1 artAttrSkinContext ;
- }else if($r==1&&$c==1){
-  artAttrCtx -e -useColorRamp 0 -colorfeedback 0 artAttrSkinContext ;
+  int $wh = 35 + size($aInf) *33 ;
+  window -e -widthHeight 200 $wh vwcw_Win ;
+  showWindow vwcw_Win ;
  }else{
-  artAttrCtx -e -useColorRamp 0 -colorfeedback 1 artAttrSkinContext ;
- }
-}
-
-
-global proc as_cancelImo(){
- $sl = ` ls -selection ` ;
- for($x in $sl){
-  if(`attributeExists "intermediateObject" $x`){
-   setAttr ($x+".intermediateObject",0) ;
-  }
- }
-}
-
-
-global proc as_reorderHistory(int $od){
- $sl = ` ls -selection ` ;
- for($x in $sl){
-  $his = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
-  reorderDeformers $his[$od] $his[$od-1] $x ;
- }
- select -replace $sl ;
-}
-
-
-global proc as_abcRange(){
- $abc = ` ls -type "AlembicNode" ` ;
- python("sf=[]") ; python("ef=[]") ;
- if(size($abc)>0){
-  for($x in $abc){
-   python("sf.append(cmds.getAttr('"+$x+".startFrame'))");
-   python("ef.append(cmds.getAttr('"+$x+".endFrame'))");
-  }
-  $sf = python("min(sf)") ;
-  $ef = python("max(ef)") ;
-  playbackOptions -minTime $sf ;
-  playbackOptions -maxTime $ef ;
- }
-}
-
-
-global proc as_nfClip(int $n){
- $fw = `getPanel -withFocus` ;
- $cam = ` modelPanel -q -camera $fw ` ;
- $camS = ` listRelatives -shapes $cam ` ;
- $near = ` getAttr($camS[0]+".nearClipPlane") ` ;
- $far = ` getAttr($camS[0]+".farClipPlane") ` ;
- if($n==0){
-  $near = $near * 10 ;
-  $far = $far * 10 ;
- }else if($n==1){
-  $near = $near * 0.1 ;
-  $far = $far * 0.1 ;
- }
- setAttr($camS[0]+".nearClipPlane",$near) ;
- setAttr($camS[0]+".farClipPlane",$far) ;
-}
-
-
-global proc as_cluster(int $mode){
- $ls = `ls -sl -fl` ;
- $mn = stringToStringArray($ls[0],".[") ;
- if(size($mn)<3){
-  if($mode==1) cluster -relative ;
-  if($mode==2) for($x in `ls -sl`) cluster -relative $x ;
- }
- else{
-  if(`softSelect -q -softSelectEnabled`) as_softCluster ;
-  else cluster -relative ;
- }
-}
-
-
-global proc as_softCluster(){
- python("import maya.OpenMaya as om");
- 
- python("selection = cmds.ls(sl=True)");
- python("sel = selection[0].split('.')");
- 
- python("richSel = om.MRichSelection()");
- python("om.MGlobal.getRichSelection(richSel)");
- 
- python("richSelList = om.MSelectionList()");
- python("richSel.getSelection(richSelList)");
- 
- python("path = om.MDagPath()");
- python("component = om.MObject()");
- python("richSelList.getDagPath(0, path, component)");
- python("componentFn = om.MFnSingleIndexedComponent(component)");
- 
- python("cluster = cmds.cluster( rel=True )");
- python("cmds.setAttr(cluster[1]+'.rotate',lock=1)");
- python("cmds.setAttr(cluster[1]+'.scale',lock=1)");
- python("cmds.setAttr(cluster[1]+'.v',keyable=0,cb=1)");
- python("clusterSet = cmds.listConnections( cluster, type=\"objectSet\" )");
- 
- python("for i in range(0,componentFn.elementCount()): weight = componentFn.weight(i); v = componentFn.element(i); w = weight.influence(); vtx = (sel[0]+'.vtx[%d]') % v; cmds.sets(vtx, add=clusterSet[0]); cmds.percent(cluster[0], vtx,  v=w ); ");
- python("cmds.select(cluster[1])");
-}
-
-
-global proc as_mirrorPoint(int $m){
- $ls = `ls -selection -long` ;
- if(size($ls)==1){
-  $s = ` listRelatives -shapes $ls[0] ` ;
-  if(size($s)==1){
-   $nt = ` nodeType $s[0] `;
-   if($nt=="mesh"){
-	$vn = ` polyEvaluate -vertex $s[0] ` ;
-	$i = 0 ;
-	while($i<$vn[0]){
-	 $v = $s[0] + ".vtx[" + $i + "]" ;
-	 $x = ` xform -q -objectSpace -t $v ` ;
-	 if($m==1) $x = ` xform -q -worldSpace -t $v ` ;
-	 if($m==0) xform -os -t ($x[0]*-1) $x[1] $x[2] $v ;
-	 if($m==1) xform -ws -t ($x[0]*-1) $x[1] $x[2] $v ;
-     $i++ ;
-	}
-   }
-  }
- }else if(size($ls)==2){
-  $s0 = ` listRelatives -shapes $ls[0] ` ;
-  $s1 = ` listRelatives -shapes $ls[1] ` ;
-  if(size($s0)==1){
-   $nt = ` nodeType $s0[0] `;
-   print $nt ;
-   if($nt=="nurbsCurve"){
-	$vn = `getAttr ($s0[0]+".spans") ` + `getAttr ($s0[0]+".degree") ` ;
-	$i = 0 ;
-	while($i<$vn){
-     $v0 = $s0[0] + ".controlPoints[" + $i + "]" ;
-     $v1 = $s1[0] + ".controlPoints[" + $i + "]" ;
-	 $xv = getAttr ($v0+".xValue") ; $yv = getAttr ($v0+".yValue") ; $zv = getAttr ($v0+".zValue") ;
-	 setAttr ($v1+".xValue") ($xv*-1) ;
-	 setAttr ($v1+".yValue") $yv ;
-	 setAttr ($v1+".zValue") $zv ;
-     $i++ ;
-	}
-   }
-  }
- }
-}
-
-global proc as_resetUiPos(){
- python("lsUi = cmds.lsUI (windows=True)");
- python("lsUi.remove('MayaWindow')");
- python("lsUi.remove('win_ConsG')");
- python("lsUi.remove('win_DeG')");
- python("lsUi.remove('win_GoS')");
- python("lsUi.remove('win_GoOs')");
- python("lsUi.remove('win_GoSet')");
- python("lsUi.remove('win_GoC')");
- python("for x in lsUi : cmds.window(x,e=1,topLeftCorner=[100,100])");
-}
-
-
-
-global proc as_zeroJointOrient(){
- $ls = `ls -sl` ;
- for($x in $ls){
-  $nt = ` nodeType $x ` ;
-  if($nt=="joint"){
-   $temp = ` createNode -skipSelect "transform" ` ;
-   matchTransform $temp $x ;
-   $ot = ` orientConstraint $temp $x ` ;
-   setAttr ($x+".jointOrient") 0 0 0 ;
-   delete $ot ;
-   delete $temp ;
-  }
- }
-}
-
-global proc as_zeroJointRotate(){
- $ls = `ls -sl` ;
- for($x in $ls){
-  $nt = ` nodeType $x ` ;
-  if($nt=="joint"){
-   $p = ` listRelatives -parent $x ` ;
-   $temp = ` createNode -skipSelect -parent $p[0] "transform" ` ;
-   matchTransform $temp $x ;
-   $ro = `getAttr ($temp+".rotate") ` ;
-   setAttr ($x+".jointOrient") $ro[0] $ro[1] $ro[2] ;
-   setAttr ($x+".rotate") 0 0 0 ;
-   delete $temp ;
-  }
+  warning "Need to select vertex with skinCluster." ;
  }
 }
 
@@ -1383,7 +1397,8 @@ global proc as_scriptFolderUI(){
    $i = 0 ;
    while($i<size($mel)){
     $n = startString($mel[$i],(size($mel[$i])-4)) ;
-    button -label $mel[$i] -command ("source \""+$fp+$mel[$i]+"\"; "+$n+"; ") ;
+	$nn = basenameEx($mel[$i]) ;
+    button -label $nn -command ("source \""+$fp+$mel[$i]+"\"; "+$n+"; ") ;
     $i++ ;
    }
   }
