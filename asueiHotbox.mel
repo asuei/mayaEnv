@@ -168,7 +168,7 @@ if($bc<8) nodeIconButton -image1 "locator.png" -c ("spaceLocator") ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "paintSkinWeights.png" -command ("ArtPaintSkinWeightsTool") ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "copySkinWeight.png" -command ("CopySkinWeightsOptions") ;
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "art3dPaint.png" -command ("weightHammerVerts") ;
+if($eSkin==1) shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "art3dPaint.png" -noDefaultPopup -command ("weightHammerVerts") ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "moveSkinnedJoint.png" -command ("as_selectInf") -annotation "Select bind inflence." ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "removeSkinInfluence.png" -command ("removeUnusedInfluences") -annotation "Remove nused influences." ;
 if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "detachSkin.png" -command ("DetachSkin") -annotation "Detach Skin." ;
@@ -232,7 +232,9 @@ iconTextButton -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation
 iconTextButton -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
 iconTextButton -image1 "polyMerge.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
 iconTextButton -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
-iconTextButton -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ;
+iconTextButton -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ashb_jo ;
+ popupMenu -parent ashb_jo ;
+ menuItem -label "orderID" -command ("as_orderID") ;
 iconTextButton -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashb_ikh ;
  popupMenu -parent ashb_ikh ;
  menuItem -label "spline IK Tool" -command ("IKSplineHandleToolOptions") ;
@@ -249,7 +251,7 @@ iconTextButton -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -
  popupMenu -parent ashb_bsp ;
  menuItem -label "remove blendShape" -command ("RemoveBlendShape") ;
 iconTextButton -image1 "setEdit.png" -command ("EditMembershipTool") -annotation "Edit membership tool" ;
-iconTextButton -image1 "cluster.png" -command ("as_cluster(1)") -annotation "cluster" ashb_cc ;
+shelfButton -image1 "cluster.png" -noDefaultPopup -command ("as_cluster(1)") -annotation "cluster" ashb_cc ;
  popupMenu -parent ashb_cc ;
  menuItem -label "Each One" -command ("as_cluster(2)") ;
 
@@ -779,6 +781,17 @@ global proc as_createJoint(){
    $i++;
   }
  }
+}
+
+global proc as_orderID(){
+ $sll = ` ls -l -sl ` ;
+ if(size($sll)>0){
+  for($x in $sll){
+   if (`attributeExists "orderID" $x`==0) {
+    addAttr -longName "orderID" -keyable true $x ;
+   }else print "Already exist." ;
+  }
+ }else print "No selection." ;
 }
 
 global proc as_posLocator(){
@@ -1416,4 +1429,5 @@ global proc as_scriptFolderUI(){
   showWindow as_scriptsFolder ;
   }
  }
+ print ("Find " + (size($mel)+size($py)) + " scripts in " + $fp ) ;
 }
