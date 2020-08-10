@@ -93,7 +93,7 @@ if($ctx=="artAttrSkinContext"){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "intermediate Obj" -command ("as_delImobj") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown node" -command ("as_delUnknown") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown node" -command ("as_delUnknown") as_unknown ;
  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
 }else if($eSel==1){
@@ -542,10 +542,16 @@ global proc as_delImobj(){
 
 global proc as_delUnknown(){
  $ukn = ` ls -type unknown ` ;
- for($x in $ukn){
-  $l = ` lockNode -q -lock $x ` ;
-  if($l[0]==1) lockNode -lock 0 $x ;
-  delete $x ;
+ if(size($ukn)>0){
+  for($x in $ukn){
+   $sn = ` sets -name "set_unknownNode" $ukn ` ;
+   $l = ` lockNode -q -lock $x ` ;
+   if($l[0]==1) lockNode -lock 0 $x ;
+   warning ("Create a " + $sn) ;
+   //delete $x ;
+  }
+ }else{
+   print "There is no unknown node." ;
  }
 }
 
