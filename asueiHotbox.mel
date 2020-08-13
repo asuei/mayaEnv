@@ -127,8 +127,10 @@ if($ctx=="artAttrSkinContext"){
   shelfButton -style "textOnly" -label "rotate" -height 35 -noDefaultPopup -command ("as_transValue({0},1,0)") ;
   shelfButton -style "textOnly" -label "scale" -height 35 -noDefaultPopup -command ("as_transValue({0},0,1)") ;
   setParent ..;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -command ("as_matrixCons") ashb_mc ;
+ //nodeIconButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -command ("as_matrixCons") ashb_mc ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -noDefaultPopup -command ("as_matrixCons(0)") ashb_mc ;
   popupMenu -parent ashb_mc ;
+  menuItem -label "Local" -command ("as_matrixCons(1)") ;
   menuItem -label "Matrix Match Space" -command ("as_matrixSpace; as_matrixCons;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "poleVectorConstraint.png" -label "Pole Vector" -command ("poleVectorConstraint -weight 1") ;
 }
@@ -579,7 +581,7 @@ global proc as_transValue(int $t[],int $ro,int $s){
 }
 
 
-global proc as_matrixCons(){
+global proc as_matrixCons(int $m){
  if(`pluginInfo -query -loaded matrixNodes`){
  }else{ loadPlugin matrixNodes; }
  
@@ -593,7 +595,8 @@ global proc as_matrixCons(){
   if(size($lc)>0) $dm = $lc[0] ;
   else{
    $dm = ` createNode -n ("xCons_"+$sl0n) -skipSelect decomposeMatrix ` ;
-   connectAttr -f ($sl[0]+".worldMatrix[0]") ($dm+".inputMatrix") ;
+   if($m==0) connectAttr -f ($sl[0]+".worldMatrix[0]") ($dm+".inputMatrix") ;
+   else if($m==1) connectAttr -f ($sl[0]+".matrix") ($dm+".inputMatrix") ;
   }
   $i = 1 ;
   while($i<size($sl)){
