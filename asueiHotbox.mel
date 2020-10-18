@@ -93,7 +93,8 @@ if($ctx=="artAttrSkinContext"){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "intermediate Obj" -command ("as_delImobj") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown node" -command ("as_delUnknown") as_unknown ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown set" -command ("as_delUnknown") as_unknown ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "lock normal" -command (" as_findLockNormal") as_unknown ;
  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
 }else if($eSel==1){
@@ -132,6 +133,7 @@ if($ctx=="artAttrSkinContext"){
   popupMenu -parent ashb_mc ;
   menuItem -label "Local" -command ("as_matrixCons(1)") ;
   menuItem -label "Matrix Match Space" -command ("as_matrixSpace; as_matrixCons;") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "polyMerge.png" -label "connect mesh" -noDefaultPopup -command ("as_connectMesh") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "poleVectorConstraint.png" -label "Pole Vector" -command ("poleVectorConstraint -weight 1") ;
 }
 
@@ -232,7 +234,7 @@ iconTextButton -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation
  menuItem -label "ctrl_ ctrlTrans_" -command ("as_trans(\"ctrl_\",\"ctrlTrans_\")") ;
  menuItem -label "_ctrl _ctrlEnv" -command ("as_trans(\"_ctrl\",\"_ctrlEnv\")") ;
 iconTextButton -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
-iconTextButton -image1 "polyMerge.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
+iconTextButton -image1 "polyCircularize.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
 iconTextButton -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
 iconTextButton -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ashb_jo ;
  popupMenu -parent ashb_jo ;
@@ -337,7 +339,6 @@ window -title "Grid of Camera" -titleBar 0 -resizeToFitChildren on win_GoC ;
 
 $lsc = ` ls -type "camera" ` ;
 gridLayout -numberOfColumns 1 -cellWidthHeight 140 36 ;
-
 
 $i = 0 ;
 while($i<size($lsc)){
@@ -557,6 +558,20 @@ global proc as_delUnknown(){
  }
 }
 
+global proc as_findLockNormal(){
+ $am = `ls -type mesh` ;
+ string $lm[] ; clear $lm ;
+ if(size($am)>0){
+  for($x in $am ){
+   $vna = ` polyEvaluate -vertex $x ` ;
+   int $vn = $vna[0] ;
+   $pnpv = `polyNormalPerVertex -q -allLocked ($x+".vtx[0:"+($vn-1)+"]")` ;
+   print $pnpv[0] ;
+   if($pnpv[0]==1) $lm[size($lm)] = $x ;
+  }
+ }
+ select -r $lm ;
+}
 
 global proc as_transValue(int $t[],int $ro,int $s){
  $sl = `ls -selection -long` ;
@@ -653,6 +668,13 @@ global proc as_matrixSpace(){
   $i++;
  }
  select -r $sll ;
+}
+
+global proc as_connectMesh(){
+ $ls = ` ls -sl ` ;
+ $s0 = ` listRelatives -shapes $ls[0] ` ;
+ $s1 = ` listRelatives -shapes $ls[1] ` ;
+ connectAttr ($s0[0]+".outMesh") ($s1[0]+".inMesh") ;
 }
 
 //================ upper right block ==============
@@ -988,21 +1010,32 @@ global proc as_reorderHistory(int $od){
 global proc as_mirrorPoint(int $m){
  $ls = `ls -selection -long` ;
  if(size($ls)==1){
-  $s = ` listRelatives -shapes $ls[0] ` ;
+  $s = ` listRelatives -shapes -noIntermediate $ls[0] ` ;
   if(size($s)==1){
    $nt = ` nodeType $s[0] `;
    if($nt=="mesh"){
-	$vn = ` polyEvaluate -vertex $s[0] ` ;
-	$i = 0 ;
-	while($i<$vn[0]){
-	 $v = $s[0] + ".vtx[" + $i + "]" ;
+	$vna = ` polyEvaluate -vertex $s[0] ` ;
+	int $vn = $vna[0] ;
+	while($vn--){
+	 $v = $s[0] + ".vtx[" + $vn + "]" ;
 	 $x = ` xform -q -objectSpace -t $v ` ;
 	 if($m==1) $x = ` xform -q -worldSpace -t $v ` ;
 	 if($m==0) xform -os -t ($x[0]*-1) $x[1] $x[2] $v ;
 	 if($m==1) xform -ws -t ($x[0]*-1) $x[1] $x[2] $v ;
-     $i++ ;
 	}
    }
+   if($nt=="nurbsCurve"){
+	int $vn = `getAttr($s[0]+".spans")` + `getAttr($s[0]+".degree")` ;
+	while($vn--){
+	 $v = $s[0] + ".cv[" + $vn + "]" ;
+	 $x = ` xform -q -objectSpace -t $v ` ;
+	 if($m==1) $x = ` xform -q -worldSpace -t $v ` ;
+	 if($m==0) xform -os -t ($x[0]*-1) $x[1] $x[2] $v ;
+	 if($m==1) xform -ws -t ($x[0]*-1) $x[1] $x[2] $v ;
+	}
+   }
+  }else{
+   warning "Have more than one shapes or no shape." ;
   }
  }else if(size($ls)==2){
   $s0 = ` listRelatives -shapes $ls[0] ` ;
