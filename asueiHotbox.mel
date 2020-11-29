@@ -81,11 +81,20 @@ if($ctx=="artAttrSkinContext"){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrSkinPaintCtx Replace; artSkinSetSelectionValue 0 false artAttrSkinPaintCtx artAttrSkin;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.01 false artAttrSkinPaintCtx artAttrSkin;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.025 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.99 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.9 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrSkinPaintCtx Smooth;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.1 false artAttrSkinPaintCtx artAttrSkin;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.9 false artAttrSkinPaintCtx artAttrSkin;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.99 false artAttrSkinPaintCtx artAttrSkin;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrSkinPaintCtx Smooth;") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "interactiveBindTool.png" -label "Scale 0.5"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.5 false artAttrSkinPaintCtx artAttrSkin;") ;
+}else if($ctx=="artAttrContext"||$ctx=="artAttrBlendShapeContext"||$ctx=="artAttrNComponentContext"){
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrCtx Replace; artAttrCtx -e -value 0 `currentCtx`;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.01 `currentCtx`;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.025 `currentCtx`;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.1 `currentCtx`;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrCtx Scale; artAttrCtx -e -value 0.9 `currentCtx`;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrCtx Scale; artAttrCtx -e -value 0.99 `currentCtx`;") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrCtx Smooth;") ;
+
 }else if($eSel==0){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "animtion key"-command ("as_animKey(\"\")") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "same name node"-command ("as_sameName") ;
@@ -93,8 +102,9 @@ if($ctx=="artAttrSkinContext"){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "intermediate Obj" -command ("as_delImobj") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unknown set" -command ("as_delUnknown") as_unknown ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "lock normal" -command (" as_findLockNormal") as_unknown ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "unknown set" -command ("as_delUnknown") as_unknown ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "lock normal" -command ("as_findLockNormal") as_lockNormal ;
+ if(size(`ls -type nCloth`)> 0) nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "Print Thickness" -command ("as_printThickness") as_thickness ;
  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
 }else if($eSel==1){
@@ -197,7 +207,7 @@ window -title "Grid of Show" -titleBar 0 -resizeToFitChildren on win_GoS ;
 gridLayout -numberOfColumns 6 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
 $asfw = `getPanel -withFocus` ;
 global int $meJo ;
-iconTextButton -style "textOnly" -label "poly\ncount" -c ("TogglePolyCount") ashb_pc ;
+iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;") ashb_pc ;
  popupMenu -parent ashb_pc ;
  menuItem -label "reset UI Position" -command ("as_resetUiPos()") ;
 iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashb_sfr ;
@@ -248,9 +258,9 @@ iconTextButton -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotati
 iconTextButton -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
  popupMenu -parent ashb_ai ;
  menuItem -label "remove influence" -command ("RemoveInfluence") ;
-iconTextButton -image1 "blendShape.png" -c ("CreateBlendShape") -annotation "blendShape" ashb_bs ;
+shelfButton -style "iconOnly" -image1 "blendShape.png" -label "Aim Option" -noDefaultPopup -command ("as_setOrigBsKey(0)") ashb_bs ;
  popupMenu -parent ashb_bs ;
- menuItem -label "create BS and set key" -command ("as_setOrigBsKey") ;
+ menuItem -label "create BS and set key" -command ("as_setOrigBsKey(1)") ;
 iconTextButton -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -noBackground 1 -annotation "Add blendShape." ashb_bsp ;
  popupMenu -parent ashb_bsp ;
  menuItem -label "remove blendShape" -command ("RemoveBlendShape") ;
@@ -281,6 +291,7 @@ iconTextButton -image1 "nClothCacheCreate.png" -command ("nClothCache") -annotat
  popupMenu -parent ashb_nCache ;
  menuItem -label "Option" -command ("nClothCacheOpt") ;
  menuItem -label "Delete nCloth cache" -command ("deleteNclothCache") ;
+
 
 //==============================
 //   |++|   |+++++|
@@ -573,6 +584,16 @@ global proc as_findLockNormal(){
  select -r $lm ;
 }
 
+global proc as_printThickness(){
+ $an = `ls -type nCloth` ;
+ $msg = "" ;
+ for($x in $an){
+  $t = `getAttr ($x+".thickness")` ;
+  $msg = $msg + $x + " thickness " + $t + "   \n" ;
+ }
+ print $msg ;
+}
+
 global proc as_transValue(int $t[],int $ro,int $s){
  $sl = `ls -selection -long` ;
  if($t[0]==1){
@@ -674,7 +695,21 @@ global proc as_connectMesh(){
  $ls = ` ls -sl ` ;
  $s0 = ` listRelatives -shapes $ls[0] ` ;
  $s1 = ` listRelatives -shapes $ls[1] ` ;
- connectAttr ($s0[0]+".outMesh") ($s1[0]+".inMesh") ;
+ 
+ if(size($s0)>0&&size($s1)>0){
+  $sourceMesh = $s0[0] ;
+  $targetMesh = $s1[0] ;
+  $s1ni = ` listRelatives -shapes -noIntermediate $ls[1]` ;
+  $s1i = stringArrayRemoveExact($s1ni,$s1) ;
+  if(size($s1i)>0){
+   for($x in $s1i){
+	$lc = ` listConnections -skipConversionNodes true $x ` ;
+	if(size($lc)>0) $targetMesh = $x ;
+   }
+  }
+  connectAttr ($sourceMesh+".outMesh") ($targetMesh+".inMesh") ;
+  print ($sourceMesh+".outMesh connect to "+$targetMesh+".inMesh") ;
+ }
 }
 
 //================ upper right block ==============
@@ -1115,14 +1150,17 @@ global proc as_transMaterial(){
  }
 }
 
-global proc as_setOrigBsKey(){
+global proc as_setOrigBsKey(int $m){
  $sl = ` ls -selection ` ;
  $bs = blendShape($sl[0],$sl[1]) ;
  $attr = $bs[0]+"."+$sl[0] ;
- $ti = ` playbackOptions -q -minTime ` ;
- $ta = ` playbackOptions -q -maxTime ` ;
- setKeyframe -time $ti -value 1 $attr ;
- setKeyframe -time $ta -value 0 $attr ;
+ if($m == 0) setAttr $attr 1 ;
+ if($m == 1){
+  $ti = ` playbackOptions -q -minTime ` ;
+  $ta = ` playbackOptions -q -maxTime ` ;
+  setKeyframe -time $ti -value 1 $attr ;
+  setKeyframe -time $ta -value 0 $attr ;
+ }
 }
 
 //================ right block ==============
