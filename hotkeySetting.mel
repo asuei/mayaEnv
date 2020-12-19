@@ -96,8 +96,11 @@ hotkey -keyShortcut "F1" -alt -name "" ;
 nameCommand -ann "Change select mode" -c ("if(`selectMode -q -object`==1) selectMode -component ; else if(`selectMode -q -component`==true) selectMode -object ;") changeSelectModeCmd ;
 hotkey -keyShortcut "F1" -altModifier -name "changeSelectModeCmd";
 
+hotkey -keyShortcut "F2" -alt -name "" ;
+nameCommand -ann "Change Move Axis" -c ("if(`manipMoveContext -q -mode $currManipMovePropertiesCtx`!=3) manipMoveContext -e -mode 3 $currManipMovePropertiesCtx ; else manipMoveContext -e -mode 0 $currManipMovePropertiesCtx ;") changeMoveAxisCmd ;
+hotkey -keyShortcut "F2" -altModifier -name "changeMoveAxisCmd";
+
 //hotkey -q -alt -name "q" ;
 //hotkey -q -alt -name "e" ;
 //hotkey -q -alt -name "f" ;
 //hotkey -q -alt -name "g" ;
-//hotkey -q -alt -name "F2" ;
