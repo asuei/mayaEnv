@@ -3,7 +3,7 @@ global proc asueiHotbox(){
 
  $sl = `ls -selection -objectsOnly` ;
  $eSel = 2 ; //Selected amount
- $eSkin = 0 ; $eBs = 0 ; $eCc = 0 ; $eCloth = 0 ; $eCrv = 0 ;
+ $eSkin = 0 ; $eBs = 0 ; $eCc = 0 ; $eCloth = 0 ; $eCrv = 0 ; $eTxt = 0 ;
 
  if(size($sl)==0) $eSel = 0 ;
  if(size($sl)==1) $eSel = 1 ;
@@ -12,9 +12,10 @@ global proc asueiHotbox(){
   $gc = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
   for($y in $gc){
    $nt = ` nodeType $y ` ;
-   if($nt=="skinCluster") $eSkin = 1 ;
+   if($nt=="skinCluster") $eSkin = 7 ;
    if($nt=="blendShape") $eBs = 1 ;
    if($nt=="cluster") $eCc = 1 ;
+   if($nt=="textureDeformer") $eTxt = 1 ;
   }
   $gc = ` listHistory -interestLevel 1 -pruneDagObjects 0 $x ` ;
   for($y in $gc){
@@ -27,7 +28,7 @@ global proc asueiHotbox(){
    if(size($s)>0) $nt = ` nodeType $s[0] ` ;
   }
   if($nt=="nurbsCurve"){
-   $eCrv = 1 ;
+   $eCrv = 2 ;
   }
  }
 
@@ -160,37 +161,47 @@ if($ctx=="artAttrSkinContext"){
 //   |++|       |++|
 //   |++|       |++|
 window  -titleBar 0 -resizeToFitChildren on win_DeG ;
-gridLayout -numberOfColumns 4 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 ;
+gridLayout -numberOfColumns 4 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_interect ;
 
 iconTextButton -style "iconAndTextCentered" -image1 "polySelectBoundary.png" -command ("as_vertexWeightCheckUI") -annotation "Vertex weight checker" ;
 iconTextButton -style "iconAndTextCentered" -image1 "bakeAnimation.png" -command ("as_attrSliderUI") -annotation "Vertex weight checker" ;
 iconTextButton -style "iconAndTextCentered" -image1 "polyType.png" -command ("performSearchReplaceNames 1") -annotation "Search Replace Names" ;
 iconTextButton -style "iconAndTextCentered" -image1 "scriptEdPersp.png" -command ("as_scriptFolderUI") -annotation "Scripts Folder" ;
 
-int $bc = $eSkin*7 + $eBs*1 + $eCc*1 + $eCloth*1 + $eCrv*2 ;
-if($bc<0) nodeIconButton -image1 "directionallight.png" -c ("defaultDirectionalLight(1, 1,1,1, \"0\", 0,0,0, 0)") ;
-if($bc<1) nodeIconButton -image1 "circle.png" -command ("circle") ;
-if($bc<2) nodeIconButton -image1 "curveCV.png" -command ("CVCurveTool") ;
-if($bc<3) nodeIconButton -image1 "curveEP.png" -command ("EPCurveTool") ;
-if($bc<4) nodeIconButton -image1 "polyCylinder.png" -c ("polyCylinder -sx 16 ") ;
-if($bc<5) nodeIconButton -image1 "polyCube.png"-command ("polyCube") ;
-if($bc<6) nodeIconButton -image1 "polySphere.png" -command ("polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;") ;
-//if($bc<7) nodeIconButton -image1 "sphere.png" -command ("sphere") ;
-if($bc<7) nodeIconButton -image1 "polyMesh.png" -c ("polyPlane -w 10 -h 10 -sx 10 -sy 10 ;") ;
-if($bc<8) nodeIconButton -image1 "locator.png" -c ("spaceLocator") ;
+string $imageList[],$cmdList[] ;
+$imageList[0] = "circle.png" ; $cmdList[0] = "circle" ;
+$imageList[1] = "curveCV.png" ; $cmdList[1] = "CVCurveTool" ;
+$imageList[2] = "curveEP.png" ; $cmdList[2] = "EPCurveTool" ;
+$imageList[3] = "polyCylinder.png" ; $cmdList[3] = "polyCylinder -sx 16 " ;
+$imageList[4] = "polyCube.png" ; $cmdList[4] = "polyCube" ;
+$imageList[5] = "polySphere.png" ; $cmdList[5] = "polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;" ;
+$imageList[6] = "polyMesh.png" ; $cmdList[6] = "polyPlane -w 10 -h 10 -sx 10 -sy 10 ;" ;
+$imageList[7] = "locator.png" ; $cmdList[7] = "spaceLocator" ;
 
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "paintSkinWeights.png" -command ("ArtPaintSkinWeightsTool") ;
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "copySkinWeight.png" -command ("CopySkinWeightsOptions") ;
-if($eSkin==1) shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "art3dPaint.png" -noDefaultPopup -command ("weightHammerVerts") ;
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "moveSkinnedJoint.png" -command ("as_selectInf") -annotation "Select bind inflence." ;
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "removeSkinInfluence.png" -command ("removeUnusedInfluences") -annotation "Remove nused influences." ;
-if($eSkin==1) nodeIconButton -bgc .15 .2 .2 -image1 "detachSkin.png" -command ("DetachSkin") -annotation "Detach Skin." ;
+int $bc = 8 - $eSkin - $eBs - $eCc - $eCloth - $eCrv ;
+$i = 0 ;
+while($i<$bc){
+ nodeIconButton -image1 $imageList[$i] -c $cmdList[$i] ;
+ $i++ ;
+}
+
+if($eSkin>0){
+ nodeIconButton -bgc .15 .2 .2 -image1 "paintSkinWeights.png" -command ("ArtPaintSkinWeightsTool") ;
+ nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
+ nodeIconButton -bgc .15 .2 .2 -image1 "copySkinWeight.png" -command ("CopySkinWeightsOptions") ;
+ shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "art3dPaint.png" -noDefaultPopup -command ("weightHammerVerts") ;
+ nodeIconButton -bgc .15 .2 .2 -image1 "moveSkinnedJoint.png" -command ("as_selectInf") -annotation "Select bind inflence." ;
+ nodeIconButton -bgc .15 .2 .2 -image1 "removeSkinInfluence.png" -command ("removeUnusedInfluences") -annotation "Remove nused influences." ;
+ nodeIconButton -bgc .15 .2 .2 -image1 "detachSkin.png" -command ("DetachSkin") -annotation "Detach Skin." ;
+}
 if($eCc==1) nodeIconButton -bgc .2 .15 .2 -image1 "paintCluster.png" -command ("artAttrToolScript 4 \"cluster\";") ;
 if($eBs==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "paintBlendshape.png" -command ("ArtPaintBlendShapeWeightsToolOptions;") ;
 if($eCloth==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "nConstraintTearable.png" -command ("setNClothMapType(\"inputAttract\",\"\",1); artAttrNClothToolScript 4 inputAttract;") ;
-if($eCrv==1) nodeIconButton -bgc .15 .15 .2 -image1 "curveEP.png" -label "CV" -command ("ToggleCVs") ;
-if($eCrv==1) nodeIconButton -bgc .15 .15 .2 -image1 "rebuildCurve.png" -command ("RebuildCurveOptions") ;
+if($eCrv>0){
+ nodeIconButton -bgc .15 .15 .2 -image1 "curveEP.png" -label "CV" -command ("ToggleCVs") ;
+ nodeIconButton -bgc .15 .15 .2 -image1 "rebuildCurve.png" -command ("RebuildCurveOptions") ;
+}
+if($eTxt==1) nodeIconButton -bgc .15 .15 .2 -image1 "textureDeformer.png" -command ("artAttrToolScript 4 \"textureDeformer\";") ;
 
 //==============================
 //   |++|   |ooooo|
@@ -278,7 +289,8 @@ iconTextButton -image1 "input.png" -command ("as_reorderHistory(1)") -annotation
  popupMenu -parent ashb_reHis ;
  menuItem -label "Order 2" -command ("as_reorderHistory(2)") ;
 iconTextButton -image1 "nClothDisplayInput.png" -command ("as_cancelImo") -annotation "Set intermediate to 0." ;
-iconTextButton -style "iconAndTextCentered" -image1 "moveNormal.png" -command ("MoveNormalTool") -annotation "Move Normal Tool" ;
+//iconTextButton -style "iconAndTextCentered" -image1 "moveNormal.png" -command ("MoveNormalTool") -annotation "Move Normal Tool" ;
+iconTextButton -style "iconAndTextCentered" -image1 "copySkinWeight.png" -command ("as_copySkinCluster") -annotation "Copy skinCluster" ;
 iconTextButton -image1 "flyThroughCursor.png" -command ("ungroup") -annotation "Ungroup" ;
 iconTextButton -image1 "polyMirrorGeometry.png" -command ("as_mirrorPoint(0)") -annotation "Mirror varied point" ashb_mrp ;
  popupMenu -parent ashb_mrp ;
@@ -1040,6 +1052,17 @@ global proc as_reorderHistory(int $od){
   reorderDeformers $his[$od] $his[$od-1] $x ;
  }
  select -replace $sl ;
+}
+
+global proc int as_copySkinCluster(){
+ $sl = ` ls -sl ` ;
+ if(size($sl)==0){ print "No selection"; return 0 ;}
+ $skn = findRelatedSkinCluster($sl[0]) ;
+ if($skn == ""){ print "No skinCluster"; return 0 ;}
+ $infs = ` skinCluster -q -influence $skn` ;
+ $ds = ` skinCluster -normalizeWeights 1 -removeUnusedInfluence 0 -toSelectedBones $infs $sl[1] ` ;
+ copySkinWeights -sourceSkin $skn -destinationSkin $ds -noMirror -surfaceAssociation "closestPoint" -influenceAssociation "name" ;
+ return 0 ;
 }
 
 global proc as_mirrorPoint(int $m){
