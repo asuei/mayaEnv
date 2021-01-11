@@ -122,6 +122,7 @@ if($ctx=="artAttrSkinContext"){
   if($nt=="tweak") $ic = "interactiveBindTool.png" ;
   nodeIconButton -style "iconAndTextHorizontal" -image1 $ic -label $x -c ("select -r "+$x) ;
  }
+  nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "Material" -command ("as_getMetarial") as_selMate ;
 }else if($eSel==2){
  shelfButton -style "iconAndTextHorizontal" -image1 "posConstraint.png" -label "Point (snap)" -noDefaultPopup -command ("pointConstraint -offset 0 0 0 -weight 1") ;
  shelfButton -style "iconAndTextHorizontal" -image1 "orientConstraint.png" -label "Orient (snap)" -noDefaultPopup -command ("orientConstraint -offset 0 0 0 -weight 1;") ;
@@ -368,7 +369,7 @@ while($i<size($lsc)){
  $p = ` listRelatives -parent $lsc[$i] ` ;
   rowLayout -numberOfColumns 2 -columnWidth2 120 20 ;
   nodeIconButton -style "textOnly" -width 120 -height 36 -label $p[0] -c ("lookThroughModelPanel "+$lsc[$i]+" (`getPanel -withFocus`)") ;
-  nodeIconButton -style "textOnly" -width 20 -height 36 -label "" -c ("window -widthHeight 640 480 "+$lsc[$i]+"_Win; paneLayout; modelPanel -camera "+$lsc[$i]+" ; showWindow "+$lsc[$i]+"_Win; ") ;
+  nodeIconButton -style "textOnly" -width 20 -height 36 -label "" -c ("as_cameraWindow(\""+$lsc[$i]+"\")") ;
   setParent ..;
  $i++;
 }
@@ -594,6 +595,13 @@ global proc as_findLockNormal(){
   }
  }
  select -r $lm ;
+}
+
+global proc as_getMetarial(){
+  	string $shapes[] = ls("-o", "-dag", "-s", (`ls -sl`));
+  	string $shadingEngines[] = listConnections("-type","shadingEngine", $shapes);
+  	string $materials[] = ls("-mat", listConnections($shadingEngines));
+	select -r $materials ;
 }
 
 global proc as_printThickness(){
@@ -1416,6 +1424,20 @@ global proc as_skinWeightExIm(int $m){
  }
  if($m==0) python("with open('"+$dir+"', 'w') as f: json.dump(skwt,f,ensure_ascii=False,indent=1)");
  print $dir ;
+}
+
+//================ camera block ==============
+global proc as_cameraWindow(string $c){
+ $wn = ("win_"+$c) ; // window name
+ 
+ if(`window -exists $wn `==0){
+  window $wn ;
+  paneLayout ;
+  modelPanel -camera $c ;
+  window -e -widthHeight (`getAttr "defaultResolution.width"`) (`getAttr "defaultResolution.height"`) $wn ;
+  showWindow $wn ;
+ }
+ 
 }
 
 //================ UI block ==============
