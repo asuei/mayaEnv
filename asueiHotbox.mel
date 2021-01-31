@@ -1027,30 +1027,39 @@ global proc as_cluster(int $mode){
 }
 
 global proc as_softCluster(){
- python("import maya.OpenMaya as om");
+ $cmd = "import maya.OpenMaya as om \n"
  
- python("selection = cmds.ls(sl=True)");
- python("sel = selection[0].split('.')");
+ +"selection = cmds.ls(sl=True) \n"
+ +"richSel = om.MRichSelection() \n"
+ +"om.MGlobal.getRichSelection(richSel) \n"
+ +"richSelList = om.MSelectionList() \n"
+ +"richSel.getSelection(richSelList) \n"
  
- python("richSel = om.MRichSelection()");
- python("om.MGlobal.getRichSelection(richSel)");
+ +"cluster = cmds.cluster( rel=True ) \n"
+ +"cmds.setAttr(cluster[1]+'.rotate',lock=1) \n"
+ +"cmds.setAttr(cluster[1]+'.scale',lock=1) \n"
+ +"cmds.setAttr(cluster[1]+'.v',keyable=0,cb=1) \n"
+ +"clusterSet = cmds.listConnections( cluster, type=\"objectSet\" ) \n"
  
- python("richSelList = om.MSelectionList()");
- python("richSel.getSelection(richSelList)");
+ +"for i,x in enumerate(selection) : \n"
+ +" path = om.MDagPath() \n"
+ +" component = om.MObject() \n"
+ +" richSelList.getDagPath(i, path, component) \n"
+ +" componentFn = om.MFnSingleIndexedComponent(component) \n"
  
- python("path = om.MDagPath()");
- python("component = om.MObject()");
- python("richSelList.getDagPath(0, path, component)");
- python("componentFn = om.MFnSingleIndexedComponent(component)");
+ +" for ii in range(0,componentFn.elementCount()): \n"
+ +"  weight = componentFn.weight(ii) \n"
+ +"  v = componentFn.element(ii) \n"
+ +"  w = weight.influence() \n"
+ +"  sel = x.split('.') \n"
+ +"  pn = sel[1].split('[')[0] \n" // point name
+ +"  vtx = (sel[0]+'.'+pn+'['+str(v)+']') \n"
+ +"  cmds.sets(vtx, add=clusterSet[0]) \n"
+ +"  cmds.percent(cluster[0], vtx,  v=w ) \n"
  
- python("cluster = cmds.cluster( rel=True )");
- python("cmds.setAttr(cluster[1]+'.rotate',lock=1)");
- python("cmds.setAttr(cluster[1]+'.scale',lock=1)");
- python("cmds.setAttr(cluster[1]+'.v',keyable=0,cb=1)");
- python("clusterSet = cmds.listConnections( cluster, type=\"objectSet\" )");
+ +"cmds.select(cluster[1])" ;
  
- python("for i in range(0,componentFn.elementCount()): weight = componentFn.weight(i); v = componentFn.element(i); w = weight.influence(); vtx = (sel[0]+'.vtx[%d]') % v; cmds.sets(vtx, add=clusterSet[0]); cmds.percent(cluster[0], vtx,  v=w ); ");
- python("cmds.select(cluster[1])");
+ python($cmd) ;
 }
 
 global proc as_reorderHistory(int $od){
