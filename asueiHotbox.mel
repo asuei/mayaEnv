@@ -1192,14 +1192,17 @@ global proc as_transMaterial(){
 
 global proc as_setOrigBsKey(int $m){
  $sl = ` ls -selection ` ;
- $bs = blendShape($sl[0],$sl[1]) ;
- $attr = $bs[0]+"."+$sl[0] ;
- if($m == 0) setAttr $attr 1 ;
- if($m == 1){
-  $ti = ` playbackOptions -q -minTime ` ;
-  $ta = ` playbackOptions -q -maxTime ` ;
-  setKeyframe -time $ti -value 1 $attr ;
-  setKeyframe -time $ta -value 0 $attr ;
+ $bs = blendShape($sl) ;
+ $t = ` blendShape -q -target $bs ` ;
+ if(size($t)==1){
+  $attr = $bs[0]+"."+$t[size($t)-1] ;
+  if($m == 0) setAttr $attr 1 ;
+  if($m == 1){
+   $ti = ` playbackOptions -q -minTime ` ;
+   $ta = ` playbackOptions -q -maxTime ` ;
+   setKeyframe -time $ti -value 1 $attr ;
+   setKeyframe -time $ta -value 0 $attr ;
+  }
  }
 }
 
