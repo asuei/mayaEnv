@@ -12,7 +12,7 @@ global proc asueiHotbox(){
   $gc = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
   for($y in $gc){
    $nt = ` nodeType $y ` ;
-   if($nt=="skinCluster") $eSkin = 7 ;
+   if($nt=="skinCluster") $eSkin = 6 ;
    if($nt=="blendShape") $eBs = 1 ;
    if($nt=="cluster") $eCc = 1 ;
    if($nt=="textureDeformer") $eTxt = 1 ;
@@ -32,21 +32,22 @@ global proc asueiHotbox(){
   }
  }
 
-
 //$slvn = ` polyEvaluate -vertexComponent ` ;
-$lsf = `ls -sl -fl -type float3` ;
-if(size($lsf)>0){
- string $mna[] ;
- for($x in $lsf){
-  $mn = stringToStringArray($x,".") ;
-  $mna[size($mna)] = $mn[0] ;
+ $lsf = `ls -selection -fl -type float3` ;
+ if(size($lsf)>0){
+  string $mna[] ;
+  $i = 0 ;
+  while($i<size($lsf)&&$i<50){
+   $mn = stringToStringArray($x,".") ;
+   $mna[size($mna)] = $mn[0] ;
+   $i++ ;
+  }
+  $mna = stringArrayRemoveDuplicates($mna) ;
+  for($x in $mna){
+   $sk = findRelatedSkinCluster($x) ;
+   if($sk!="") $eSel =3 ;
+  }
  }
- $mna = stringArrayRemoveDuplicates($mna) ;
- for($x in $mna){
-  $sk = findRelatedSkinCluster($x) ;
-  if($sk!="") $eSel =3 ;
- }
-}
 
 
 //==============================
@@ -109,7 +110,7 @@ if($ctx=="artAttrSkinContext"){
  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
 }else if($eSel==1){
- $sp = ` listRelatives -shapes -noIntermediate -path $sl ` ;
+ $sp = ` listRelatives -shapes -noIntermediate -path $sl ` ; // shape path
  $ip = ` listHistory -pruneDagObjects 1 -interestLevel 1 $sl ` ;
  $op = ` listHistory -pruneDagObjects 1 -interestLevel 1 -future 1 $sl ` ;
  $ap = stringArrayCatenate($sp,$ip) ;
@@ -122,7 +123,7 @@ if($ctx=="artAttrSkinContext"){
   if($nt=="tweak") $ic = "interactiveBindTool.png" ;
   nodeIconButton -style "iconAndTextHorizontal" -image1 $ic -label $x -c ("select -r "+$x) ;
  }
-  nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "Material" -command ("as_getMetarial") as_selMate ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "Material" -command ("as_getMetarial") as_selMate ;
 }else if($eSel==2){
  shelfButton -style "iconAndTextHorizontal" -image1 "posConstraint.png" -label "Point (snap)" -noDefaultPopup -command ("pointConstraint -offset 0 0 0 -weight 1") ;
  shelfButton -style "iconAndTextHorizontal" -image1 "orientConstraint.png" -label "Orient (snap)" -noDefaultPopup -command ("orientConstraint -offset 0 0 0 -weight 1;") ;
@@ -166,7 +167,7 @@ gridLayout -numberOfColumns 4 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_inte
 
 iconTextButton -style "iconAndTextCentered" -image1 "polySelectBoundary.png" -command ("as_vertexWeightCheckUI") -annotation "Vertex weight checker" ;
 iconTextButton -style "iconAndTextCentered" -image1 "bakeAnimation.png" -command ("as_attrSliderUI") -annotation "Vertex weight checker" ;
-iconTextButton -style "iconAndTextCentered" -image1 "polyType.png" -command ("performSearchReplaceNames 1") -annotation "Search Replace Names" ;
+iconTextButton -style "iconAndTextCentered" -image1 "paintSkinWeights.png" -command ("as_paintWeightTools") -annotation "Auto detect paint weight tool" ;
 iconTextButton -style "iconAndTextCentered" -image1 "scriptEdPersp.png" -command ("as_scriptFolderUI") -annotation "Scripts Folder" ;
 
 string $imageList[],$cmdList[] ;
@@ -187,7 +188,6 @@ while($i<$bc){
 }
 
 if($eSkin>0){
- nodeIconButton -bgc .15 .2 .2 -image1 "paintSkinWeights.png" -command ("ArtPaintSkinWeightsTool") ;
  nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
  nodeIconButton -bgc .15 .2 .2 -image1 "copySkinWeight.png" -command ("CopySkinWeightsOptions") ;
  shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "art3dPaint.png" -noDefaultPopup -command ("weightHammerVerts") ;
@@ -197,12 +197,11 @@ if($eSkin>0){
 }
 if($eCc==1) nodeIconButton -bgc .2 .15 .2 -image1 "paintCluster.png" -command ("artAttrToolScript 4 \"cluster\";") ;
 if($eBs==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "paintBlendshape.png" -command ("ArtPaintBlendShapeWeightsToolOptions;") ;
-if($eCloth==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "nConstraintTearable.png" -command ("setNClothMapType(\"inputAttract\",\"\",1); artAttrNClothToolScript 4 inputAttract;") ;
+if($eCloth==1) nodeIconButton -bgc .2 .2 .15 -style "iconOnly" -image1 "nConstraintTearable.png" -command ("setNClothMapType(\"inputAttract\",\"\",1); artAttrNClothToolScript 4 inputAttract;") -annotation "Paint Input Attract" ;
 if($eCrv>0){
  nodeIconButton -bgc .15 .15 .2 -image1 "curveEP.png" -label "CV" -command ("ToggleCVs") ;
  nodeIconButton -bgc .15 .15 .2 -image1 "rebuildCurve.png" -command ("RebuildCurveOptions") ;
 }
-if($eTxt==1) nodeIconButton -bgc .15 .15 .2 -image1 "textureDeformer.png" -command ("artAttrToolScript 4 \"textureDeformer\";") ;
 
 //==============================
 //   |++|   |ooooo|
@@ -299,12 +298,14 @@ iconTextButton -image1 "polyMirrorGeometry.png" -command ("as_mirrorPoint(0)") -
  menuItem -label "Reverse Normals" -command ("ReversePolygonNormals") ;
 iconTextButton -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
 iconTextButton -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
-iconTextButton -image1 "nClothCreatePassive.png" -command ("nClothMakeCollideOptions") -annotation "Make collide options" ;
-iconTextButton -image1 "nClothCacheCreate.png" -command ("nClothCache") -annotation "Create nCloth cache" ashb_nCache ;
+//iconTextButton -image1 "nClothCreatePassive.png" -command ("nClothMakeCollideOptions") -annotation "Make collide options" ;
+iconTextButton -image1 "menuIconKeys.png" -command ("SetDrivenKeyOptions") -annotation "Driven Key" ;
+//iconTextButton -image1 "nClothCacheCreate.png" -command ("nClothCache") -annotation "Create nCloth cache" ashb_nCache ;
+iconTextButton -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
  popupMenu -parent ashb_nCache ;
  menuItem -label "Option" -command ("nClothCacheOpt") ;
  menuItem -label "Delete nCloth cache" -command ("deleteNclothCache") ;
-
+ menuItem -label "Identify nCache" -command ("as_identifyNCache") ;
 
 //==============================
 //   |++|   |+++++|
@@ -342,10 +343,12 @@ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Ex"
  popupMenu -parent ashb_qe ;
  menuItem -label "Export Selection" -c ("as_selectionExIm(0)") ;
  menuItem -label "Export skin weight" -c ("as_skinWeightExIm(0)") ;
+ menuItem -label "Export animation key" -c ("as_animExIm(0)") ;
 iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im" -command ("as_quickExIm(1)") ashb_qi ;
  popupMenu -parent ashb_qi ;
  menuItem -label "Import Selection" -c ("as_selectionExIm(1)") ;
  menuItem -label "Import skin weight" -c ("as_skinWeightExIm(1)") ;
+ menuItem -label "Import animation key" -c ("as_animExIm(1)") ;
 
 //==============================
 //   |++|   |+++++|
@@ -570,12 +573,11 @@ global proc as_delImobj(){
 global proc as_delUnknown(){
  $ukn = ` ls -type unknown ` ;
  if(size($ukn)>0){
+  $sn = ` sets -name "set_unknownNode" $ukn ` ;
   for($x in $ukn){
-   $sn = ` sets -name "set_unknownNode" $ukn ` ;
    $l = ` lockNode -q -lock $x ` ;
    if($l[0]==1) lockNode -lock 0 $x ;
-   warning ("Create a " + $sn) ;
-   //delete $x ;
+  warning ("Create a " + $sn) ;
   }
  }else{
    print "There is no unknown node." ;
@@ -1148,6 +1150,7 @@ global proc as_transMaterial(){
  $sl = `ls -selection -long ` ;
  $nt = ` nodeType $sl[0] ` ;
  $sp = ` listRelatives -shapes -path $sl[0] ` ;
+ $transAttr = {".overrideEnabled",".overrideColor",".overrideRGBColors",".overrideColorR",".overrideColorG",".overrideColorB"} ;
  if(size($sp)>0) $nt = ` nodeType $sp[0] ` ;
  if($nt=="mesh"||$nt=="nurbsSurface"){
   $sg = ` listConnections -type shadingEngine $sp[0] ` ;
@@ -1163,7 +1166,6 @@ global proc as_transMaterial(){
   for($x in $sl){
    $tsp = ` listRelatives -shapes -path $x ` ;
    for($y in $tsp){
-    print $y ;
     setAttr ($y+".overrideEnabled") $oe ;
     setAttr ($y+".overrideColor") $oi ;
     setAttr ($y+".overrideRGBColors") $oc ;
@@ -1188,6 +1190,24 @@ global proc as_transMaterial(){
    setAttr ($x+".overrideColorB") $ob ;
   }
  }
+}
+
+global proc string as_nodeType(string $node){
+ if(`nodeType $node`=="transform"){
+  $s = ` listRelatives -shapes $node ` ;
+  if(size($s)>0){
+   return ` nodeType $s[0] ` ;
+  }else return "transform" ;
+ }else return `nodeType $node` ;
+}
+
+global proc as_identifyNCache(){
+ $sl = `ls -selection` ;
+ string $systemList[] ;
+ for($x in $sl){
+  if(as_nodeType($x)=="nCloth") $systemList[size($systemList)]= $x ;
+ }
+ print $systemList ;
 }
 
 global proc as_setOrigBsKey(int $m){
@@ -1438,6 +1458,44 @@ global proc as_skinWeightExIm(int $m){
  print $dir ;
 }
 
+global proc int as_animExIm(int $m){
+ $sl = ` ls -l -sl ` ;
+ if(size($sl)==0) { print "No select." ; return 0 ; }
+ $lsl = $sl[size($sl)-1] ;
+ $cb = ` channelBox -q -selectedMainAttributes mainChannelBox ` ;
+ if(size($cb)==0) { print "No select attribute." ; return 0 ; }
+ $lcb = $cb[size($cb)-1] ;
+ $an = ($lsl+"."+$lcb) ;
+ 
+ $dir = ` whatIs asueiHotbox ` ;
+ $dir = python("'"+$dir+"'.replace('Mel procedure found in: ','')") ;
+ $dir = dirname($dir) + "/asueiHotboxExportAnimation.json" ;
+ 
+ if($m==1){ // export process
+  $cmd = "with open('"+$dir+"') as f: exList = json.load(f)\n" 
+  +"for x in exList :\n"
+  +" cmds.setKeyframe('"+$lsl+"',at='"+$lcb+"',t=x[0],v=x[1],inTangentType=x[2],outTangentType=x[3])" ;
+  python($cmd) ;
+  print ("Set keyframe on "+$an) ;
+  return 0 ;
+ }
+ $lc = ` listConnections -source 1 -destination 0 -type "animCurve" $an ` ;
+ if(size($lc)==0) { print "No animation key." ; return 0 ; }
+ 
+ if($m==1) python("with open('"+$dir+"') as f: skwt = json.load(f)");
+ 
+ $cmd = "exList = []\n"
+ +"for x in cmds.keyframe('"+$lc[0]+"',q=1,indexValue=1):\n"
+ +" exList.append(cmds.keyframe('"+$lc[0]+"',index=(int(x),int(x)),q=1,timeChange=1,valueChange=1))\n"
+ +" exList[int(x)].append(cmds.keyTangent('"+$lc[0]+"',index=(int(x),int(x)),q=1,inTangentType=1)[0])\n"
+ +" exList[int(x)].append(cmds.keyTangent('"+$lc[0]+"',index=(int(x),int(x)),q=1,outTangentType=1)[0])\n"
+ +"print exList\n" 
+ +"with open('"+$dir+"', 'w') as f: json.dump(exList,f,ensure_ascii=False,indent=1)" ;
+ python($cmd) ;
+ print ("Export to "+$dir) ;
+ return 0 ;
+}
+
 //================ camera block ==============
 global proc as_cameraWindow(string $c){
  $wn = ("win_"+$c) ; // window name
@@ -1530,6 +1588,41 @@ global proc int as_attrSliderUI(){
   $i++ ;
  }
  showWindow $asasWin ; return 0 ;
+}
+
+global proc int as_paintWeightTools(){
+ $sla = ` ls -long -selection ` ;
+ if (size($sla)==0){ warning "No selected object"; return 0 ;}
+ $sl = $sla[size($sla)-1] ;
+ $gc = ` listHistory -interestLevel 1 -pruneDagObjects 0 $sl ` ;
+ string $wo[] ;
+ for($x in $gc){
+  $nt = ` nodeType $x ` ;
+  if($nt=="skinCluster") $wo[size($wo)] = "skinCluster" ;
+  if($nt=="cluster") $wo[size($wo)] = "cluster" ;
+  if($nt=="textureDeformer") $wo[size($wo)] = "textureDeformer" ;
+  if($nt=="blendShape") $wo[size($wo)] = "blendShape" ;
+ }
+ if(size($wo)>1){
+  if(`window -exists asPwtWin`) deleteUI -window asPwtWin ;
+  window -title "Select paint weight deformer" -resizeToFitChildren on asPwtWin ;
+  paneLayout ;
+  textScrollList -selectCommand ("as_paintWeightScript(\"\")") asPwtScrollList ;
+  for($x in $wo) textScrollList -e -append $x asPwtScrollList ;
+  showWindow asPwtWin ;
+ }else as_paintWeightScript($wo[0]) ;
+ return 0 ;
+}
+
+global proc as_paintWeightScript(string $deformer){
+ if(`window -exists asPwtWin`){
+  $sel = ` textScrollList -q -selectItem asPwtScrollList ` ;
+  $deformer = $sel[0] ;
+ }
+ if($deformer=="skinCluster") { ArtPaintSkinWeightsTool ; print "Set to paint skinCluster" ; }
+ else if($deformer=="cluster")  artAttrToolScript 4 "cluster" ;
+ else if($deformer=="textureDeformer")  artAttrToolScript 4 "textureDeformer" ;
+ else if($deformer=="blendShape")  ArtPaintBlendShapeWeightsToolOptions ; 
 }
 
 global proc as_scriptFolderUI(){
