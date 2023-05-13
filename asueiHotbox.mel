@@ -215,7 +215,7 @@ if($eCrv>0){
 //   |++|       |++|
 //   |++|       |++|
 window -title "Grid of Show" -titleBar 0 -resizeToFitChildren on win_GoS ;
-gridLayout -numberOfColumns 6 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
+gridLayout -numberOfColumns 7 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
 $asfw = `getPanel -withFocus` ;
 global int $meJo ;
 iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;") ashb_pc ;
@@ -224,6 +224,7 @@ iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLe
 iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashb_sfr ;
  popupMenu -parent ashb_sfr ;
  menuItem -label "abc Range" -command ("as_abcRange") ;
+iconTextButton -style "textOnly" -label "cam\nPref" -c ("as_camPref()") ashb_camRref ;
 iconTextButton -style "textOnly" -label "joint" -c ("if($meJo==0){ modelEditor -e -joints 1 modelPanel4; $meJo=1; } else { modelEditor -e -joints 0 modelPanel4; $meJo=0; }") ;
 iconTextButton -style "textOnly" -label "farClip" -c ("as_nfClip(0)") ashb_clip ;
  popupMenu -parent ashb_clip ;
@@ -269,9 +270,10 @@ iconTextButton -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotati
 iconTextButton -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
  popupMenu -parent ashb_ai ;
  menuItem -label "remove influence" -command ("RemoveInfluence") ;
-shelfButton -style "iconOnly" -image1 "blendShape.png" -label "Aim Option" -noDefaultPopup -command ("as_setOrigBsKey(0)") ashb_bs ;
+shelfButton -style "iconOnly" -image1 "blendShape.png" -label "blendShape" -noDefaultPopup -command ("as_setOrigBsKey(0)") ashb_bs ;
  popupMenu -parent ashb_bs ;
- menuItem -label "create BS and set key" -command ("as_setOrigBsKey(1)") ;
+ menuItem -label "Origin World" -command ("as_setOrigBsKey(1)") ;
+ menuItem -label "create BS and set key" -command ("as_setOrigBsKey(2)") ;
 iconTextButton -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -noBackground 1 -annotation "Add blendShape." ashb_bsp ;
  popupMenu -parent ashb_bsp ;
  menuItem -label "remove blendShape" -command ("RemoveBlendShape") ;
@@ -344,11 +346,13 @@ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Ex"
  menuItem -label "Export Selection" -c ("as_selectionExIm(0)") ;
  menuItem -label "Export skin weight" -c ("as_skinWeightExIm(0)") ;
  menuItem -label "Export animation key" -c ("as_animExIm(0)") ;
+ menuItem -label "Export Sets" -c ("as_setsExIm(0)") ;
 iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im" -command ("as_quickExIm(1)") ashb_qi ;
  popupMenu -parent ashb_qi ;
  menuItem -label "Import Selection" -c ("as_selectionExIm(1)") ;
  menuItem -label "Import skin weight" -c ("as_skinWeightExIm(1)") ;
  menuItem -label "Import animation key" -c ("as_animExIm(1)") ;
+ menuItem -label "Import Sets" -c ("as_setsExIm(1)") ;
 
 //==============================
 //   |++|   |+++++|
@@ -475,8 +479,11 @@ global proc as_constrainSource(){
 
 global proc as_delConstrain(){
  $sl = ` ls -sl `; 
- $lr = ` listRelatives -children -type "constraint" $sl[size($sl)-1] ` ;
- delete $lr ;
+ //$lr = ` listRelatives -children -type "constraint" $sl[size($sl)-1] ` ;
+ for($x in $sl){
+  $lr = ` listRelatives -children -type "constraint" $x ` ;
+  delete $lr ;
+ }
 }
 
 
@@ -750,6 +757,14 @@ global proc as_selectInf(){
 
 //================ top block ==============
 
+global proc as_camPref(){
+ $fw = `getPanel -withFocus` ;
+ $cam = ` modelPanel -q -camera $fw ` ;
+ $camS = ` listRelatives -shapes $cam ` ;
+ setAttr ($camS[0]+".focalLength",50) ;
+ setAttr ($camS[0]+".overscan",1) ;
+}
+
 global proc as_nfClip(int $n){
  $fw = `getPanel -withFocus` ;
  $cam = ` modelPanel -q -camera $fw ` ;
@@ -864,8 +879,14 @@ global proc as_createJoint(){
   select -r $tr ; 
  }else{
   $i = 0 ;
-  while($i<size($sl)){
+  while($i<size($sl)){   
    $jn = ` createNode -name ($sl[$i]+"JT") joint -parent $sll[$i] ` ;
+   $nt = `nodeType $sll[$i]`;
+   if($nt=="joint"){
+    $jr = `getAttr ($sll[$i]+".radius")`;
+	print $jr ;
+	setAttr ($jn+".radius") $jr ;
+   }
    $i++;
   }
  }
@@ -1213,11 +1234,13 @@ global proc as_identifyNCache(){
 global proc as_setOrigBsKey(int $m){
  $sl = ` ls -selection ` ;
  $bs = blendShape($sl) ;
+ if($m == 1) setAttr ($bs[0]+".origin") 0 ;
  $t = ` blendShape -q -target $bs ` ;
- if(size($t)==1){
-  $attr = $bs[0]+"."+$t[size($t)-1] ;
+ $as = `aliasAttr -q $bs ` ;
+ if(size($as)==2){
+  $attr = $bs[0]+"."+$as[0] ;
   if($m == 0) setAttr $attr 1 ;
-  if($m == 1){
+  if($m == 2){
    $ti = ` playbackOptions -q -minTime ` ;
    $ta = ` playbackOptions -q -maxTime ` ;
    setKeyframe -time $ti -value 1 $attr ;
@@ -1352,7 +1375,7 @@ global proc as_zeroJointRotate(){
  }
 }
 
-global proc asLockAttr(){
+global proc as_LockAttr(){
  $sl = ` ls -sl ` ; $i = 0 ;
  while($i<size($sl)){
   $slt = ` nodeType $sl[$i] ` ;
@@ -1496,6 +1519,32 @@ global proc int as_animExIm(int $m){
  return 0 ;
 }
 
+global proc as_setsExIm(int $m){
+ python("import json");
+ $dir = ` whatIs asueiHotbox ` ;
+ $dir = python("'"+$dir+"'.replace('Mel procedure found in: ','')") ;
+ $dir = dirname($dir) + "/asueiHotboxExportSets.json" ;
+ python("exSets = []");
+ if($m==0){
+  $sl = ` ls -selection ` ;
+  for($i=0;$i<size($sl);$i++){ // loop of selected objects
+   python("sInfo = []");
+   python("obj = '"+$sl[$i]+"'");
+   python("sInfo.append(obj)");
+   python("member = cmds.sets('"+$sl[$i]+"',q=1)");
+   python("sInfo.append(member)");
+   python("exSets.append(sInfo)");
+  }
+  python("with open('"+$dir+"', 'w') as f: json.dump(exSets,f,ensure_ascii=False,indent=1)");
+  print $dir ;
+ }
+ 
+ if($m==1){
+  python("with open('"+$dir+"') as f: exSets = json.load(f)");
+  python("for x in exSets : cmds.sets(x[1],name=x[0])");
+ }
+}
+
 //================ camera block ==============
 global proc as_cameraWindow(string $c){
  $wn = ("win_"+$c) ; // window name
@@ -1582,7 +1631,8 @@ global proc int as_attrSliderUI(){
     if(` getAttr -type $ran `=="doubleAngle") $minV = $v - 120 ; $maxV = $v + 120 ;
    }
    $sn = "fsbg_" + $sls[$i] + "_" + $cb[$j] ; // slider name
-   floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step (($maxV-$minV)/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
+   //floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step (($maxV-$minV)/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
+   attrFieldSliderGrp -min $minV -max $maxV -at $ran ;
    $j++;
   }
   $i++ ;
@@ -1598,16 +1648,22 @@ global proc int as_paintWeightTools(){
  string $wo[] ;
  for($x in $gc){
   $nt = ` nodeType $x ` ;
+  print ($nt+" ") ;
   if($nt=="skinCluster") $wo[size($wo)] = "skinCluster" ;
   if($nt=="cluster") $wo[size($wo)] = "cluster" ;
   if($nt=="textureDeformer") $wo[size($wo)] = "textureDeformer" ;
   if($nt=="blendShape") $wo[size($wo)] = "blendShape" ;
+  if($nt=="deltaMush") $wo[size($wo)] = "deltaMush" ;
+  if($nt=="tension") $wo[size($wo)] = "tension" ;
+  if($nt=="nCloth") $wo[size($wo)] = "Input Attract" ;
+  if($nt=="nCloth") $wo[size($wo)] = "Mass" ;
  }
+ 
  if(size($wo)>1){
   if(`window -exists asPwtWin`) deleteUI -window asPwtWin ;
   window -title "Select paint weight deformer" -resizeToFitChildren on asPwtWin ;
   paneLayout ;
-  textScrollList -selectCommand ("as_paintWeightScript(\"\")") asPwtScrollList ;
+  textScrollList -selectCommand ("as_paintWeightScript(\"\")") -doubleClickCommand ("deleteUI -window asPwtWin") asPwtScrollList ;
   for($x in $wo) textScrollList -e -append $x asPwtScrollList ;
   showWindow asPwtWin ;
  }else as_paintWeightScript($wo[0]) ;
@@ -1623,6 +1679,10 @@ global proc as_paintWeightScript(string $deformer){
  else if($deformer=="cluster")  artAttrToolScript 4 "cluster" ;
  else if($deformer=="textureDeformer")  artAttrToolScript 4 "textureDeformer" ;
  else if($deformer=="blendShape")  ArtPaintBlendShapeWeightsToolOptions ; 
+ else if($deformer=="deltaMush")  artAttrToolScript 4 "deltaMush" ; 
+ else if($deformer=="tension")  artAttrToolScript 4 "tension" ;
+ else if($deformer=="Input Attract")  { setNClothMapType("inputAttract","",1); artAttrNClothToolScript 4 inputAttract ; } 
+ else if($deformer=="Mass") { setNClothMapType("mass","",1); artAttrNClothToolScript 4 mass; } 
 }
 
 global proc as_scriptFolderUI(){
