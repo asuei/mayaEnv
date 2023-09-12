@@ -1077,7 +1077,7 @@ global proc as_softCluster(){
  +"  sel = x.split('.') \n"
  +"  pn = sel[1].split('[')[0] \n" // point name
  +"  vtx = (sel[0]+'.'+pn+'['+str(v)+']') \n"
- +"  cmds.sets(vtx, add=clusterSet[0]) \n"
+ +"  cmds.sets(vtx, add=clusterSet[0]) \n" // trun off component ID in 2022
  +"  cmds.percent(cluster[0], vtx,  v=w ) \n"
  
  +"cmds.select(cluster[1])" ;
@@ -1707,8 +1707,9 @@ global proc as_scriptFolderUI(){
   }
   if(size($py)>0){
    python("import sys");
+   python("import maya.OpenMaya as om");
    python("pPath = '"+$fp+"'");
-   python("print pPath");
+   python("om.MGlobal.displayInfo(pPath)");
    python("if pPath not in sys.path : sys.path.append(pPath)");
    $i = 0 ;
    while($i<size($py)){
