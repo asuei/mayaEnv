@@ -1,7 +1,7 @@
 // 如果Maya在 Hotkey set 中是  Maya Default 的話無法變更, 要先取消 Maya default
 //currently need : asueiHotbox.mel as_naming.py
 // $scrptPath = "D:\/asuei.ling\/cScripts\/" ;
-// $scrptPath = "D:\/workingProjects\/Maya_project\/scriptsBase\/" ;
+// $scrptPath = "D:\/workingProjects\/mayaProject\/scripts\/mayaEnv\/" ;
 
 // Asuei Hotbox : press ` and release // hotkey -q -name "`" ;
 hotkey -keyShortcut "`" -name "" ;
