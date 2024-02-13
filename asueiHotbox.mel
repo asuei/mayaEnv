@@ -1689,12 +1689,20 @@ global proc as_scriptFolderUI(){
  $fp = ` workspace -q -rootDirectory ` ;
  $fp = $fp + "scripts/" ;
 
+ for($i=0;$i<3;$i++){
+  if($i==0) $fp2 = $fp +"mayaUI/" ;
+  if($i==1) $fp2 = $fp +"mayaCmd/" ;
+  if($i==2) $fp2 = $fp ;
+  if(`filetest -d $fp2 `){
+  }
+ }
  $mel = ` getFileList -folder $fp -filespec "*.mel" ` ;
  $py = ` getFileList -folder $fp -filespec "*.py" ` ;
  
  if((size($mel)+size($py))>0){
   if(`window -exists as_scriptsFolder`) deleteUI -window as_scriptsFolder ;
   window -title "Scripts Folder" -resizeToFitChildren on as_scriptsFolder ;
+  scrollLayout -horizontalScrollBarThickness 0 scroll_asScriptFolderUI ;
   gridLayout -numberOfColumns 1 -cellWidthHeight 200 35;
   if(size($mel)>0){
    $i = 0 ;
@@ -1709,7 +1717,7 @@ global proc as_scriptFolderUI(){
    python("import sys");
    python("import maya.OpenMaya as om");
    python("pPath = '"+$fp+"'");
-   python("om.MGlobal.displayInfo(pPath)");
+   //python("om.MGlobal.displayInfo(pPath)");
    python("if pPath not in sys.path : sys.path.append(pPath)");
    $i = 0 ;
    while($i<size($py)){
