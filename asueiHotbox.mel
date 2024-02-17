@@ -220,9 +220,11 @@ window -title "Grid of Show" -titleBar 0 -resizeToFitChildren on win_GoS ;
 gridLayout -numberOfColumns 7 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
 $asfw = `getPanel -withFocus` ;
 global int $meJo ;
-iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;") ashb_pc ;
+iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;ToggleObjectDetails;") ashb_pc ;
  popupMenu -parent ashb_pc ;
  menuItem -label "reset UI Position" -command ("as_resetUiPos()") ;
+ menuItem -label "Add attributes" -command ("as_attrHub()") ;
+ menuItem -label "Rmove attributes" -command ("as_attrHubRemove()") ;
 iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashb_sfr ;
  popupMenu -parent ashb_sfr ;
  menuItem -label "abc Range" -command ("as_abcRange") ;
@@ -763,8 +765,10 @@ global proc as_camPref(){
  $fw = `getPanel -withFocus` ;
  $cam = ` modelPanel -q -camera $fw ` ;
  $camS = ` listRelatives -shapes $cam ` ;
- setAttr ($camS[0]+".focalLength",50) ;
- setAttr ($camS[0]+".overscan",1) ;
+ if (`getAttr -settable ($camS[0]+".focalLength") `) setAttr ($camS[0]+".focalLength",50) ;
+ if (`getAttr -settable ($camS[0]+".overscan")`) setAttr ($camS[0]+".overscan",1) ;
+ if (`getAttr -settable ($camS[0]+".nearClipPlane")`&&`getAttr ($camS[0]+".nearClipPlane")`<1) setAttr ($camS[0]+".nearClipPlane",1) ;
+ if (`getAttr -settable ($camS[0]+".filmFit") `) setAttr ($camS[0]+".filmFit",0) ;
 }
 
 global proc as_nfClip(int $n){
@@ -794,6 +798,24 @@ global proc as_resetUiPos(){
  python("lsUi.remove('win_GoSet')");
  python("lsUi.remove('win_GoC')");
  python("for x in lsUi : cmds.window(x,e=1,topLeftCorner=[100,100])");
+}
+
+global proc float as_attrHubCmd(string $cb){
+ if(`objExists($cb)`) return `getAttr $cb` ;
+ else return 0 ;
+}
+
+global proc as_attrHub(){
+ $cb = `selectedChannelBoxPlugs` ;
+ for($x in $cb){
+  headsUpDisplay -section 6 -block (`headsUpDisplay -nextFreeBlock 6`) -label $x  -command ("as_attrHubCmd(\""+$x+"\")")
+                 -event "SelectionChanged" -nodeChanges "attributeChange" ("hub_"+$x) ;
+ }
+}
+
+global proc as_attrHubRemove(){
+ $s6 = `headsUpDisplay -nextFreeBlock 6 ` ;
+ for($i=0;$i<$s6;$i++) headsUpDisplay -removePosition 6 $i;
 }
 
 global proc as_abcRange(){
