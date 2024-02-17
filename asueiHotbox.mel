@@ -808,7 +808,13 @@ global proc float as_attrHubCmd(string $cb){
 global proc as_attrHub(){
  $cb = `selectedChannelBoxPlugs` ;
  for($x in $cb){
-  headsUpDisplay -section 6 -block (`headsUpDisplay -nextFreeBlock 6`) -label $x  -command ("as_attrHubCmd(\""+$x+"\")")
+  $on = python("'"+$x+"'.split('.')[0]");
+  $an = python("'"+$x+"'.split('.')[-1]");
+  $xs = python("'"+$on+"'.replace('Shape','')");
+  $xs = python("'"+$on+"'.replace('ClothNodeShape','')");
+  $anl = ` attributeQuery -longName -node $on $an ` ;
+  if(size($anl)<=10) $an = $anl ;
+  headsUpDisplay -section 6 -block (`headsUpDisplay -nextFreeBlock 6`) -label ($xs+"."+$an+" ")  -command ("as_attrHubCmd(\""+$x+"\")")
                  -event "SelectionChanged" -nodeChanges "attributeChange" ("hub_"+$x) ;
  }
 }
