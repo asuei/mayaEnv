@@ -2,6 +2,7 @@ global proc asueiHotbox(){
  python("import maya.cmds as cmds");
  python("import sys");
  python("import maya.OpenMaya as om");
+ python("import imp");
 
  $sl = `ls -selection -objectsOnly` ;
  $eSel = 2 ; //Selected amount
@@ -1745,7 +1746,8 @@ global proc as_scriptFolderUI(){
     $i = 0 ;
     while($i<size($py)){
      $n = startString($py[$i],(size($py[$i])-3)) ;
-     button -label $py[$i] -command ("python(\"exec \\\"try: reload("+$n+")\\\\nexcept NameError: import "+$n+"\\\"\");") ;
+	 //button -label $py[$i] -command ("python(\"exec \\\"try: reload("+$n+")\\\\nexcept NameError: import "+$n+"\\\"\");") ;
+	 button -label $py[$i] -command ("python(\"try: imp.reload("+$n+")\\nexcept: import "+$n+"\");") ;
      $i++ ;
     }
    }
