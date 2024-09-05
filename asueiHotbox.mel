@@ -101,14 +101,15 @@ if($ctx=="artAttrSkinContext"){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrCtx Smooth;") ;
 
 }else if($eSel==0){
- nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "animtion key"-command ("as_animKey(\"\")") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "zoomIn.png" -label "animtion key"-command ("as_animKey(\"\")") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "same name node"-command ("as_sameName") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "bindPose" -c ("as_delPose") ashBtn_dbp ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "intermediate Obj" -command ("as_delImobj") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "Erase.png" -label "intermediate Obj" -command ("as_delImobj") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "unknown set" -command ("as_delUnknown") as_unknown ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "lock normal" -command ("as_findLockNormal") as_lockNormal ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "unlock lambert1" -command ("lockNode -lock 0 -lockUnpublished 0 \"initialShadingGroup\" ;") ;
  if(size(`ls -type nCloth`)> 0) nodeIconButton -style "iconAndTextHorizontal" -image1 "menuIconHelp.png" -label "Print Thickness" -command ("as_printThickness") as_thickness ;
  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
@@ -148,7 +149,7 @@ if($ctx=="artAttrSkinContext"){
  shelfButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -noDefaultPopup -command ("as_matrixCons(0)") ashb_mc ;
   popupMenu -parent ashb_mc ;
   menuItem -label "Local" -command ("as_matrixCons(1)") ;
-  menuItem -label "Matrix Match Space" -command ("as_matrixSpace; as_matrixCons;") ;
+  menuItem -label "Matrix Match Space" -command ("as_matrixSpace; as_matrixCons(0);") ;
  shelfButton -style "iconAndTextHorizontal" -image1 "polyMerge.png" -label "connect mesh" -noDefaultPopup -command ("as_connectMesh") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "poleVectorConstraint.png" -label "Pole Vector" -command ("poleVectorConstraint -weight 1") ;
 }
