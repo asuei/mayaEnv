@@ -166,7 +166,7 @@ if($ctx=="artAttrSkinContext"){
 //   |++| |++|  |++|
 //   |++|       |++|
 //   |++|       |++|
-window  -titleBar 0 -resizeToFitChildren on win_DeG ;
+window  -titleBar 0 -widthHeight 160 120 win_DeG ;
 gridLayout -numberOfColumns 4 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_interect ;
 
 iconTextButton -style "iconAndTextCentered" -image1 "polySelectBoundary.png" -command ("as_vertexWeightCheckUI") -annotation "Vertex weight checker" ;
@@ -190,6 +190,7 @@ while($i<$bc){
  nodeIconButton -image1 $imageList[$i] -c $cmdList[$i] ;
  $i++ ;
 }
+window -e -resizeToFitChildren on win_DeG ;
 
 if($eSkin>0){
  nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
@@ -218,7 +219,7 @@ if($eCrv>0){
 //   |++| |++|  |++|
 //   |++|       |++|
 //   |++|       |++|
-window -title "Grid of Show" -titleBar 0 -resizeToFitChildren on win_GoS ;
+window -title "Grid of Show" -titleBar 0 -widthHeight 280 40 win_GoS ;
 gridLayout -numberOfColumns 7 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
 
 $asfw = `getPanel -withFocus` ;
@@ -240,6 +241,7 @@ iconTextButton -style "textOnly" -label "show\nall" -c ("modelEditor -e -allObje
 iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true -strokes true "+$asfw) ashb_cView ;
  popupMenu -parent ashb_cView ;
  menuItem -label "No Strokes" -command ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true "+$asfw) ;
+window -e -resizeToFitChildren on win_GoS ;
 
 //==============================
 //   |oo|   |+++++|
@@ -305,7 +307,7 @@ shelfButton -noDefaultPopup -image1 "polyMirrorGeometry.png" -command ("as_mirro
  menuItem -label "Reverse Normals" -command ("ReversePolygonNormals") ;
 shelfButton -noDefaultPopup -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
 shelfButton -noDefaultPopup -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
-shelfButton -image1 "menuIconKeys.png" -command ("SetDrivenKeyOptions") -annotation "Driven Key" ;
+shelfButton -image1 "setDrivenKeyframe.png" -command ("SetDrivenKey") -annotation "Driven Key" ;
 shelfButton -noDefaultPopup -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
  popupMenu -parent ashb_nCache ;
  menuItem -label "Option" -command ("nClothCacheOpt") ;
@@ -1647,16 +1649,31 @@ global proc int as_attrSliderUI(){
   if(size($cb)==0){ print "No selected attribute"; return 0 ; }
   $j = 0 ;
   while($j<size($cb)){
-   $an = $sls[$i] + "." + $cb[$j] ; // attribute name
-   $ran = $sll[$i] + "." + $cb[$j] ; // real attribute name
+   $an = $sls[$i] + "." + $cb[$j] ; // short attribute name
+   $ran = $sll[$i] + "." + $cb[$j] ; // long attribute name
    float $v = ` getAttr $ran ` ;
    float $minV = $v - 50 ;
    float $maxV = $v + 50 ;
    if(`addAttr -q -exists $ran`){
 	if(`addAttr -q -hasMinValue $ran`) $minV = ` addAttr -q -minValue $ran ` ;
 	if(`addAttr -q -hasMaxValue $ran`) $maxV = ` addAttr -q -maxValue $ran ` ;
-   }else{
-    if(` getAttr -type $ran `=="doubleAngle") $minV = $v - 120 ; $maxV = $v + 120 ;
+   }
+   if($cb[$j]=="rx"||$cb[$j]=="ry"||$cb[$j]=="rz") { $minV = $v - 120 ; $maxV = $v + 120 ; }
+   if($cb[$j]=="sx"||$cb[$j]=="sy"||$cb[$j]=="sz") { $minV = $v * 0.01 ; $maxV = $v * 3 ; }
+   if($cb[$j]=="tx"){
+	$etx = `transformLimits -q -etx $sll[$i]` ;
+	$tx = ` transformLimits -q -tx $sll[$i] ` ;
+	if($etx[0]==1&&$etx[1]==1) {$minV = $tx[0] ; $maxV = $tx[1] ; }
+   }
+   if($cb[$j]=="ty"){
+	$ety = `transformLimits -q -ety $sll[$i]` ;
+	$ty = ` transformLimits -q -ty $sll[$i] ` ;
+	if($ety[0]==1&&$ety[1]==1) {$minV = $ty[0] ; $maxV = $ty[1] ; }
+   }
+   if($cb[$j]=="tz"){
+	$etz = `transformLimits -q -etz $sll[$i]` ;
+	$tz = ` transformLimits -q -tz $sll[$i] ` ;
+	if($etz[0]==1&&$etz[1]==1) {$minV = $tz[0] ; $maxV = $tz[1] ; }
    }
    $sn = "fsbg_" + $sls[$i] + "_" + $cb[$j] ; // slider name
    //floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step (($maxV-$minV)/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
@@ -1676,7 +1693,7 @@ global proc int as_paintWeightTools(){
  string $wo[] ;
  for($x in $gc){
   $nt = ` nodeType $x ` ;
-  print ($nt+" ") ;
+  //print ($nt+" ") ;
   if($nt=="skinCluster") $wo[size($wo)] = "skinCluster" ;
   if($nt=="cluster") $wo[size($wo)] = "cluster" ;
   if($nt=="textureDeformer") $wo[size($wo)] = "textureDeformer" ;
