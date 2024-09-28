@@ -220,6 +220,7 @@ if($eCrv>0){
 //   |++|       |++|
 window -title "Grid of Show" -titleBar 0 -resizeToFitChildren on win_GoS ;
 gridLayout -numberOfColumns 7 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
+
 $asfw = `getPanel -withFocus` ;
 global int $meJo ;
 iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;ToggleObjectDetails;") ashb_pc ;
@@ -240,7 +241,6 @@ iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObj
  popupMenu -parent ashb_cView ;
  menuItem -label "No Strokes" -command ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true "+$asfw) ;
 
-
 //==============================
 //   |oo|   |+++++|
 //   |oo| |++|  |+++|
@@ -255,61 +255,58 @@ iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObj
 window -title "Grid of Objects" -titleBar 0 -resizeToFitChildren on win_GoOs ;
 gridLayout -numberOfColumns 2 -cellWidthHeight 45 45 -bgc 0.21 0.21 0.2 ;
 
-iconTextButton -image1 "create.png" -c ("as_posLocator") -annotation "Locator at select transform." ;
-iconTextButton -image1 "toonToPolygons.png" -command ("as_copyPivot") -annotation "Copy Pivot." ashb_cp ;
-iconTextButton -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation "Create parent transform." ashb_cpt ;
+shelfButton -noDefaultPopup -image1 "create.png" -c ("as_posLocator") -annotation "Locator at select transform." ;
+shelfButton -noDefaultPopup -image1 "toonToPolygons.png" -command ("as_copyPivot") -annotation "Copy Pivot." ashb_cp ;
+shelfButton -noDefaultPopup -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation "Create parent transform." ashb_cpt ;
  popupMenu -parent ashb_cpt ;
  menuItem -label "ctrl_ ctrlTrans_" -command ("as_trans(\"ctrl_\",\"ctrlTrans_\")") ;
  menuItem -label "_ctrl _ctrlEnv" -command ("as_trans(\"_ctrl\",\"_ctrlEnv\")") ;
-iconTextButton -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
-iconTextButton -image1 "polyCircularize.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
-iconTextButton -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
-iconTextButton -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ashb_jo ;
+shelfButton -noDefaultPopup -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
+shelfButton -noDefaultPopup -image1 "polyCircularize.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
+shelfButton -noDefaultPopup -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
+shelfButton -noDefaultPopup -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ashb_jo ;
  popupMenu -parent ashb_jo ;
  menuItem -label "orderID" -command ("as_orderID") ;
-iconTextButton -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashb_ikh ;
+shelfButton -noDefaultPopup -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashb_ikh ;
  popupMenu -parent ashb_ikh ;
  menuItem -label "spline IK Tool" -command ("IKSplineHandleToolOptions") ;
-iconTextButton -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ashb_sbs ;
+shelfButton -noDefaultPopup -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ashb_sbs ;
  popupMenu -parent ashb_sbs ;
  menuItem -label "Rebind" -command ("as_rebind") ;
-iconTextButton -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
+shelfButton -noDefaultPopup -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
  popupMenu -parent ashb_ai ;
  menuItem -label "remove influence" -command ("RemoveInfluence") ;
 shelfButton -style "iconOnly" -image1 "blendShape.png" -label "blendShape" -noDefaultPopup -command ("as_setOrigBsKey(0)") ashb_bs ;
  popupMenu -parent ashb_bs ;
  menuItem -label "Origin World" -command ("as_setOrigBsKey(1)") ;
  menuItem -label "create BS and set key" -command ("as_setOrigBsKey(2)") ;
-iconTextButton -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -noBackground 1 -annotation "Add blendShape." ashb_bsp ;
+shelfButton -noDefaultPopup -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -noBackground 1 -annotation "Add blendShape." ashb_bsp ;
  popupMenu -parent ashb_bsp ;
  menuItem -label "remove blendShape" -command ("RemoveBlendShape") ;
-iconTextButton -image1 "setEdit.png" -command ("EditMembershipTool") -annotation "Edit membership tool" ;
+shelfButton -noDefaultPopup -image1 "setEdit.png" -command ("EditMembershipTool") -annotation "Edit membership tool" ;
 shelfButton -image1 "cluster.png" -noDefaultPopup -command ("as_cluster(1)") -annotation "cluster" ashb_cc ;
  popupMenu -parent ashb_cc ;
  menuItem -label "Each One" -command ("as_cluster(2)") ;
-
-iconTextButton -image1 "wire.png" -command ("wireContext -e -dropoffDistance 100 wireCtx; WireTool;") -annotation "wire tool" ;
-iconTextButton -image1 "lattice.png" -command ("lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 ;") -annotation "lattice" ashb_ffd ;
+shelfButton -noDefaultPopup -image1 "wire.png" -command ("wireContext -e -dropoffDistance 100 wireCtx; WireTool;") -annotation "wire tool" ;
+shelfButton -noDefaultPopup -image1 "lattice.png" -command ("lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 ;") -annotation "lattice" ashb_ffd ;
  popupMenu -parent ashb_ffd ;
  menuItem -label "Each One" -command ("for($x in `ls -sl`) lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 $x ;") ;
-iconTextButton -image1 "wrap.png" -command ("doWrapArgList \"3\" {\"1\",\"0\",\"5\",\"2\"};") -annotation "wrap" ;
-iconTextButton -image1 "input.png" -command ("as_reorderHistory(1)") -annotation "Reorder History." ashb_reHis ;
+shelfButton -noDefaultPopup -image1 "wrap.png" -command ("doWrapArgList \"3\" {\"1\",\"0\",\"5\",\"2\"};") -annotation "wrap" ;
+shelfButton -noDefaultPopup -image1 "input.png" -command ("as_reorderHistory(1)") -annotation "Reorder History." ashb_reHis ;
  popupMenu -parent ashb_reHis ;
  menuItem -label "Order 2" -command ("as_reorderHistory(2)") ;
 iconTextButton -image1 "nClothDisplayInput.png" -command ("as_cancelImo") -annotation "Set intermediate to 0." ;
 //iconTextButton -style "iconAndTextCentered" -image1 "moveNormal.png" -command ("MoveNormalTool") -annotation "Move Normal Tool" ;
-iconTextButton -style "iconAndTextCentered" -image1 "copySkinWeight.png" -command ("as_copySkinCluster") -annotation "Copy skinCluster" ;
-iconTextButton -image1 "flyThroughCursor.png" -command ("ungroup") -annotation "Ungroup" ;
-iconTextButton -image1 "polyMirrorGeometry.png" -command ("as_mirrorPoint(0)") -annotation "Mirror varied point" ashb_mrp ;
+shelfButton -noDefaultPopup -image1 "copySkinWeight.png" -command ("as_copySkinCluster") -annotation "Copy skinCluster" ;
+shelfButton -noDefaultPopup -image1 "flyThroughCursor.png" -command ("ungroup") -annotation "Ungroup" ;
+shelfButton -noDefaultPopup -image1 "polyMirrorGeometry.png" -command ("as_mirrorPoint(0)") -annotation "Mirror varied point" ashb_mrp ;
  popupMenu -parent ashb_mrp ;
  menuItem -label "Mirror worldSpace" -command ("as_mirrorPoint(1)") ;
  menuItem -label "Reverse Normals" -command ("ReversePolygonNormals") ;
-iconTextButton -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
-iconTextButton -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
-//iconTextButton -image1 "nClothCreatePassive.png" -command ("nClothMakeCollideOptions") -annotation "Make collide options" ;
-iconTextButton -image1 "menuIconKeys.png" -command ("SetDrivenKeyOptions") -annotation "Driven Key" ;
-//iconTextButton -image1 "nClothCacheCreate.png" -command ("nClothCache") -annotation "Create nCloth cache" ashb_nCache ;
-iconTextButton -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
+shelfButton -noDefaultPopup -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
+shelfButton -noDefaultPopup -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
+shelfButton -image1 "menuIconKeys.png" -command ("SetDrivenKeyOptions") -annotation "Driven Key" ;
+shelfButton -noDefaultPopup -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
  popupMenu -parent ashb_nCache ;
  menuItem -label "Option" -command ("nClothCacheOpt") ;
  menuItem -label "Delete nCloth cache" -command ("deleteNclothCache") ;
@@ -372,7 +369,6 @@ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im"
 //   |++|       |oo|
 //   |++|       |oo|
 window -title "Grid of Camera" -titleBar 0 -resizeToFitChildren on win_GoC ;
-
 
 $lsc = ` ls -type "camera" ` ;
 gridLayout -numberOfColumns 1 -cellWidthHeight 140 36 ;
@@ -1133,6 +1129,7 @@ global proc int as_copySkinCluster(){
  $infs = ` skinCluster -q -influence $skn` ;
  $ds = ` skinCluster -normalizeWeights 1 -removeUnusedInfluence 0 -toSelectedBones $infs $sl[1] ` ;
  copySkinWeights -sourceSkin $skn -destinationSkin $ds -noMirror -surfaceAssociation "closestPoint" -influenceAssociation "name" ;
+ select -r $sl ;
  return 0 ;
 }
 
