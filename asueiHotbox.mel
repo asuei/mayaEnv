@@ -437,8 +437,22 @@ global proc as_beConstraint(int $t,int $ro,int $s){
  for($i=0;$i<size($sll);$i++){
   $loc = ` spaceLocator -name ($sl[$i]+"_pin") ` ;
   matchTransform $loc $sl[$i] ;
-  if($t==1) pointConstraint -offset 0 0 0 -weight 1 $loc $sll[$i] ;
-  if($ro==1) orientConstraint -offset 0 0 0 -weight 1 $loc $sll[$i] ;
+  if($t==1){
+   $cmd = "pointConstraint -offset 0 0 0 " ;
+   if(`getAttr -lock ($sll[$i]+".tx")`) $cmd = $cmd + "-skip x"  ;
+   if(`getAttr -lock ($sll[$i]+".ty")`) $cmd = $cmd + "-skip y"  ;
+   if(`getAttr -lock ($sll[$i]+".tz")`) $cmd = $cmd + "-skip z"  ;
+   $cmd = $cmd + "-weight 1 " + $loc[0] + " " + $sll[$i] + ";" ;
+   eval($cmd) ;
+  }
+  if($ro==1){
+   $cmd = "orientConstraint -offset 0 0 0 " ;
+   if(`getAttr -lock ($sll[$i]+".rx")`) $cmd = $cmd + "-skip x"  ;
+   if(`getAttr -lock ($sll[$i]+".ry")`) $cmd = $cmd + "-skip y"  ;
+   if(`getAttr -lock ($sll[$i]+".rz")`) $cmd = $cmd + "-skip z"  ;
+   $cmd = $cmd + "-weight 1 " + $loc[0] + " " + $sll[$i] + ";" ;
+   eval($cmd) ;
+  }
  }
  select -r $sll ;
 }
