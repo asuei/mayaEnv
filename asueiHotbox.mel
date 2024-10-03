@@ -356,6 +356,7 @@ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im"
  popupMenu -parent ashb_qi ;
  menuItem -label "Import Selection" -c ("as_selectionExIm(1)") ;
  menuItem -label "Import skin weight" -c ("as_skinWeightExIm(1)") ;
+ menuItem -label "Import skin weight by vertex" -c ("as_skinWeightExIm(2)") ;
  menuItem -label "Import animation key" -c ("as_animExIm(1)") ;
  menuItem -label "Import Sets" -c ("as_setsExIm(1)") ;
 
@@ -1473,8 +1474,9 @@ global proc as_skinWeightExIm(int $m){
  $dir = python("'"+$dir+"'.replace('Mel procedure found in: ','')") ;
  $dir = dirname($dir) + "/asueiHotboxExportSkinWeight.json" ;
  python("skwt = []");
- if($m==1) python("with open('"+$dir+"') as f: skwt = json.load(f)");
+ if($m==1||$m==2) python("with open('"+$dir+"') as f: skwt = json.load(f)");
  $sl = ` ls -selection ` ;
+ if($m==2) $sl = ` ls -selection -flatten ` ;
  
  for($i=0;$i<size($sl);$i++){ // loop of selected objects
   python("obj = '"+$sl[$i]+"'");
@@ -1484,7 +1486,15 @@ global proc as_skinWeightExIm(int $m){
   if($m==1){
    python("vInfo = skwt["+$i+"]");
    python("jInf = [ x[0] for x in vInfo[0] ]");
-   if($skn=="") python("skn = cmds.skinCluster(jInf,obj,toSelectedBones=1)[0]"); 
+   $jInf = python("jInf");
+   string $noInf[] ;
+   //for($y in $inf){ if(objExists $y)==0) { $noInf[size($noInf)]=$y } } ;
+   for($y in $jInf) {
+	if(`objExists $y`==0) { $noInf[size($noInf)]=$y ; }
+   }
+   $sas = stringArrayToString($noInf," ") ;
+   if(size($noInf) > 0) { error ("There are no : "+$sas) ; }
+   if($skn==""&&$m!=2) python("skn = cmds.skinCluster(jInf,obj,toSelectedBones=1)[0]"); 
    else{
     $inf = `skinCluster -q -influence $skn`;
 	$jInf = python("jInf");
@@ -1502,8 +1512,19 @@ global proc as_skinWeightExIm(int $m){
     python("vInfo.append([ (x,y) for x,y in zip(tList,vList) ])");
    }else if($m==1){
     $vName = $sl[$i]+".vtx["+$j+"]";
-	if(`objExists $vName`) python("cmds.skinPercent(skn,'"+$vName+"',transformValue=vInfo["+$j+"])");
+	if(`objExists $vName`) python("cmds.skinPercent(skn,'"+$vName+"',transformValue=vInfo["+$j+"])");	
    }
+  }
+  
+  if($m==2){
+   python("vInfo = skwt[0]");
+   $obj = python("'"+$sl[$i]+"'.split('.')[0]") ;
+   $skn = findRelatedSkinCluster($obj) ;
+   python("skn = '"+$skn+"'") ;
+   $vN = python("'"+$sl[$i]+"'.split('[')[-1]") ;
+   $vN = python("'"+$vN+"'.replace(']','')") ;
+   $iVn = int($vN) ;
+   python("cmds.skinPercent(skn,'"+$sl[$i]+"',transformValue=vInfo["+$iVn+"])");
   }
   if($m==0) python("skwt.append(vInfo)");
  }
