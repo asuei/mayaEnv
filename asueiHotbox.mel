@@ -102,6 +102,7 @@ if($ctx=="artAttrSkinContext"){
 
 }else if($eSel==0){
  nodeIconButton -style "iconAndTextHorizontal" -image1 "zoomIn.png" -label "animtion key"-command ("as_animKey(\"\")") ;
+ nodeIconButton -style "iconAndTextHorizontal" -image1 "zoomOut.png" -label "AnimObj" -command ("as_animKey(\"obj\")") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "aselect.png" -label "same name node"-command ("as_sameName") ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "bindPose" -c ("as_delPose") ashBtn_dbp ;
  nodeIconButton -style "iconAndTextHorizontal" -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
@@ -331,7 +332,7 @@ gridLayout -numberOfColumns 5 -cellWidthHeight 45 45 -bgc 0.22 0.2 0.2 ;
 iconTextButton -style "iconAndTextCentered" -image1 "setKeyframe.png" -label "" -command ("as_setTestKey") ashb_testKey ;
  popupMenu -parent ashb_testKey ;
  menuItem -label "clean key" -c ("as_cleanKey(0)") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "AnimObj" -command ("as_animKey(\"obj\")") ;
+shelfButton -image1 "setDrivenKeyframe.png" -command ("SetDrivenKey") -annotation "Driven Key" ;
 iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "set\nAttr" -command ("as_attrZero(-1)") ashb_zero ;
  popupMenu -parent ashb_zero ;
  menuItem -label "round 2 decimal" -c ("as_attrZero(2)") ;
