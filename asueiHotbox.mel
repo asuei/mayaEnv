@@ -147,12 +147,13 @@ if($ctx=="artAttrSkinContext"){
   shelfButton -style "textOnly" -label "scale" -height 35 -noDefaultPopup -command ("as_transValue({0},0,1)") ;
   setParent ..;
  //nodeIconButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -command ("as_matrixCons") ashb_mc ;
- shelfButton -style "iconAndTextHorizontal" -image1 "posDrag.png" -label "Matrix" -noDefaultPopup -command ("as_matrixCons(0)") ashb_mc ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "motionPathKey.png" -label "Matrix Space" -noDefaultPopup -command ("as_matrixSpace(0)") ashb_mc ;
   popupMenu -parent ashb_mc ;
-  menuItem -label "Local" -command ("as_matrixCons(1)") ;
-  menuItem -label "Matrix Match Space" -command ("as_matrixSpace; as_matrixCons(0);") ;
+  menuItem -label "Local" -command ("as_matrixSpace(1)") ;
+  menuItem -label "Matrix Space (maintainOffset)" -command ("as_matrixOffset; as_matrixSpace(0);") ;
  shelfButton -style "iconAndTextHorizontal" -image1 "polyMerge.png" -label "connect mesh" -noDefaultPopup -command ("as_connectMesh") ;
- nodeIconButton -style "iconAndTextHorizontal" -image1 "poleVectorConstraint.png" -label "Pole Vector" -command ("poleVectorConstraint -weight 1") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "motionPath.png" -label "MatCons (offset)" -noDefaultPopup -command ("as_matrixCons(0)") ;
+ shelfButton -style "iconAndTextHorizontal" -image1 "flowPathObj.png" -label "MatCons (trans)" -noDefaultPopup -command ("as_matrixCons(1)") ;
 }
 
 
@@ -179,7 +180,7 @@ string $imageList[],$cmdList[] ;
 $imageList[0] = "circle.png" ; $cmdList[0] = "circle" ;
 $imageList[1] = "curveCV.png" ; $cmdList[1] = "CVCurveTool" ;
 $imageList[2] = "curveEP.png" ; $cmdList[2] = "EPCurveTool" ;
-$imageList[3] = "polyCylinder.png" ; $cmdList[3] = "polyCylinder -sx 16 " ;
+$imageList[3] = "modifyCurl.png" ; $cmdList[3] = "curveLocator" ;
 $imageList[4] = "polyCube.png" ; $cmdList[4] = "polyCube" ;
 $imageList[5] = "polySphere.png" ; $cmdList[5] = "polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;" ;
 $imageList[6] = "polyMesh.png" ; $cmdList[6] = "polyPlane -w 10 -h 10 -sx 10 -sy 10 ;" ;
@@ -338,12 +339,18 @@ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "set
  menuItem -label "round 2 decimal" -c ("as_attrZero(2)") ;
  menuItem -label "round 1 decimal" -c ("as_attrZero(1)") ;
  menuItem -label "round 0 decimal" -c ("as_attrZero(0)") ;
- menuItem -label "Zero Joint Orient" -c ("as_zeroJointOrient") ;
- menuItem -label "Zero Rotate (joint)" -c ("as_zeroJointRotate") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "open\nAttr" -command ("as_attrDefault") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "lock\nAttr" -command ("asLockAttr") ashb_la ;
- popupMenu -parent ashb_la ;
- menuItem -label "Prefer angle and Rotate orient" -c ("asLockPreferOrient") ;
+ menuItem -label "Reveal Rotate" -c ("as_zeroJointOrient") ;
+ menuItem -label "Zero Rotate (set jointOrient)" -c ("as_zeroJointRotate") ;
+ menuItem -label "Set Default Value" -c ("as_setDefaultValue") ;
+iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "open\nAttr" -command ("as_attrDefault") ashb_open ;
+ popupMenu -parent ashb_open ;
+ menuItem -label "lock\nAttr" -c ("as_LockAttr") ;
+ menuItem -label "Prefer angle and Rotate orient" -c ("as_LockPreferOrient") ;
+iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "add\nAttr" -command ("as_LockAttr") ashb_ada ;
+ popupMenu -parent ashb_ada ;
+ menuItem -label "QuatX" -c ("as_quatRot(\"X\")") ;
+ menuItem -label "QuatY" -c ("as_quatRot(\"Y\")") ;
+ menuItem -label "QuatZ" -c ("as_quatRot(\"Z\")") ;
 iconTextButton -style "iconAndTextCentered" -image1 "flow.png" -label "" -command ("sets `ls -sl`;") ;
 iconTextButton -style "iconAndTextCentered" -image1 "flowSurface.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -add $sl[size($sl)-1] $sl2 ;") ;
 iconTextButton -style "iconAndTextCentered" -image1 "flowSurfaceDelete.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -remove $sl[size($sl)-1]  ;") ;
@@ -665,8 +672,7 @@ global proc as_transValue(int $t[],int $ro,int $s){
  }
 }
 
-
-global proc as_matrixCons(int $m){
+global proc as_matrixSpace(int $m){
  if(`pluginInfo -query -loaded matrixNodes`){
  }else{ loadPlugin matrixNodes; }
  
@@ -696,8 +702,7 @@ global proc as_matrixCons(int $m){
  select -d $sl[0] ;
 }
 
-
-global proc as_matrixSpace(){
+global proc as_matrixOffset(){
  $sl = ` ls -sl ` ;
  $sll = ` ls -l -sl ` ;
  $i = 1 ;
@@ -740,6 +745,32 @@ global proc as_matrixSpace(){
  select -r $sll ;
 }
 
+global proc as_matrixCons(int $m){
+    if(`pluginInfo -query -loaded matrixNodes`){
+    }else{ loadPlugin matrixNodes; }
+    
+    $sl = ` ls -long -sl ` ;
+    if(size($sl)>=2){
+     for($i=1;$i<size($sl);$i++){
+      $sla = stringToStringArray($sl[$i], "|");
+      $n = $sla[size($sla)-1] ;
+      $mx = ` createNode -n ("multX_"+$n) -skipSelect multMatrix` ;
+      $p = `listRelatives -p $sl[$i]`;
+      connectAttr -f ($sl[0]+".worldMatrix[0]") ($mx+".matrixIn[0]") ;
+      if(size($p)>0) connectAttr -f ($p[0]+".worldInverseMatrix[0]") ($mx+".matrixIn[1]") ;
+      if($m==0) connectAttr ($mx+".matrixSum",$sl[$i]+".offsetParentMatrix") ;
+      if($m==1){
+       $dm = ` createNode -n ("deX_"+$n) -skipSelect decomposeMatrix` ;
+       connectAttr ($mx+".matrixSum") ($dm+".inputMatrix") ;
+       connectAttr ($dm+".outputTranslate") ($sl[$i]+".translate") ;
+       connectAttr ($dm+".outputRotate") ($sl[$i]+".rotate") ;
+       connectAttr ($dm+".outputScale") ($sl[$i]+".scale") ;
+       connectAttr ($dm+".outputShear") ($sl[$i]+".shear") ;
+      }
+     }
+    }
+}
+
 global proc as_connectMesh(){
  $ls = ` ls -sl ` ;
  $s0 = ` listRelatives -shapes $ls[0] ` ;
@@ -773,6 +804,15 @@ global proc as_selectInf(){
  }
  $ja = stringArrayRemoveDuplicates($ja) ;
  select -r $ja ;
+}
+
+global proc curveLocator(){
+ $a = 1 ;
+ $s = "ctrl_" ;
+ string $ce = "curve -d 1" ;
+ $ce = $ce + " -p " + $a + " 0 0 -p " + ($a*-1) + " 0 0 -p 0 0 0 -p 0 " + $a + " 0 -p 0 " + ($a*-1) + " 0 -p 0 0 0 -p 0 0 " + $a + " -p 0 0 " + ($a*-1) ;
+ $ce = $ce + " -k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -n " + $s ;
+ $rn = eval($ce);
 }
 
 //================ top block ==============
@@ -1386,6 +1426,22 @@ global proc as_attrZero(int $method){
  }
 }
 
+global proc as_setDefaultValue(){
+ $sl = ` ls -l -sl ` ;
+ $i = 0 ; 
+ while($i<size($sl)){
+  $cb = ` channelBox -q -selectedMainAttributes mainChannelBox ` ;
+  $j = 0 ;
+  while($j<size($cb)){
+   string $attr = $sl[$i] + "." + $cb[$j] ;
+   $v = `getAttr $attr` ;
+   addAttr -e -defaultValue $v $attr ;
+   $j++;
+  }
+  $i++;
+ }
+}
+
 global proc as_cleanKey(int $method){
  $sl = ` ls -selection -objectsOnly ` ;
  for($x in $sl){
@@ -1438,7 +1494,7 @@ global proc as_LockAttr(){
  }
 }
 
-global proc asLockPreferOrient(){
+global proc as_LockPreferOrient(){
  $sl = ` ls -sl ` ; $i = 0 ;
  while($i<size($sl)){
   $slt = ` nodeType $sl[$i] ` ;
@@ -1461,6 +1517,27 @@ global proc as_zeroJointOrient(){
    delete $temp ;
   }
  }
+}
+
+global proc as_quatRot(string $axis){
+ if(`pluginInfo -query -loaded quatNodes`){
+ }else{ loadPlugin quatNodes; }
+ $ls = ` ls -selection ` ;
+ $s = "X" ;
+ if($axis=="Y") $s = "Y" ;
+ if($axis=="Z") $s = "Z" ;
+ for($x in $ls){
+  createNode -name ("e2q_"+$x+$axis) eulerToQuat ;
+  createNode -name ("q2e_"+$x+$axis) quatToEuler ;
+  if($axis=="Y") setAttr ("q2e_"+$x+$axis+".inputRotateOrder") 1 ;
+  connectAttr ($x+".rotate") ("e2q_"+$x+$axis+".inputRotate") ;
+  connectAttr ($x+".rotateOrder") ("e2q_"+$x+$axis+".inputRotateOrder") ;
+  connectAttr ("e2q_"+$x+$axis+".outputQuat"+$axis) ("q2e_"+$x+$axis+".inputQuat"+$axis) ;
+  connectAttr ("e2q_"+$x+$axis+".outputQuatW") ("q2e_"+$x+$axis+".inputQuatW") ;
+  addAttr -ln ("quat"+$axis) -at double -keyable true $x ;
+  connectAttr ("q2e_"+$x+$axis+".outputRotate"+$axis) ($x+".quat"+$axis) ;
+ }
+ select -r $ls ;
 }
 
 global proc as_quickExIm(int $i){
@@ -1691,29 +1768,36 @@ global proc int as_attrSliderUI(){
    float $minV = $v - 50 ;
    float $maxV = $v + 50 ;
    if(`addAttr -q -exists $ran`){
-	if(`addAttr -q -hasMinValue $ran`) $minV = ` addAttr -q -minValue $ran ` ;
-	if(`addAttr -q -hasMaxValue $ran`) $maxV = ` addAttr -q -maxValue $ran ` ;
+    if(`addAttr -q -hasMinValue $ran`) $minV = ` addAttr -q -minValue $ran ` ;
+    if(`addAttr -q -hasMaxValue $ran`) $maxV = ` addAttr -q -maxValue $ran ` ;
    }
    if($cb[$j]=="rx"||$cb[$j]=="ry"||$cb[$j]=="rz") { $minV = $v - 120 ; $maxV = $v + 120 ; }
    if($cb[$j]=="sx"||$cb[$j]=="sy"||$cb[$j]=="sz") { $minV = $v * 0.01 ; $maxV = $v * 3 ; }
    if($cb[$j]=="tx"){
-	$etx = `transformLimits -q -etx $sll[$i]` ;
-	$tx = ` transformLimits -q -tx $sll[$i] ` ;
-	if($etx[0]==1&&$etx[1]==1) {$minV = $tx[0] ; $maxV = $tx[1] ; }
+    $etx = `transformLimits -q -etx $sll[$i]` ;
+    $tx = ` transformLimits -q -tx $sll[$i] ` ;
+    if($etx[0]==1&&$etx[1]==1) {$minV = $tx[0] ; $maxV = $tx[1] ; }
    }
    if($cb[$j]=="ty"){
-	$ety = `transformLimits -q -ety $sll[$i]` ;
-	$ty = ` transformLimits -q -ty $sll[$i] ` ;
-	if($ety[0]==1&&$ety[1]==1) {$minV = $ty[0] ; $maxV = $ty[1] ; }
+    $ety = `transformLimits -q -ety $sll[$i]` ;
+    $ty = ` transformLimits -q -ty $sll[$i] ` ;
+    if($ety[0]==1&&$ety[1]==1) {$minV = $ty[0] ; $maxV = $ty[1] ; }
    }
    if($cb[$j]=="tz"){
-	$etz = `transformLimits -q -etz $sll[$i]` ;
-	$tz = ` transformLimits -q -tz $sll[$i] ` ;
-	if($etz[0]==1&&$etz[1]==1) {$minV = $tz[0] ; $maxV = $tz[1] ; }
+    $etz = `transformLimits -q -etz $sll[$i]` ;
+    $tz = ` transformLimits -q -tz $sll[$i] ` ;
+    if($etz[0]==1&&$etz[1]==1) {$minV = $tz[0] ; $maxV = $tz[1] ; }
    }
    $sn = "fsbg_" + $sls[$i] + "_" + $cb[$j] ; // slider name
-   //floatSliderButtonGrp -label $an -field true -columnAlign 2 right -value $v -min $minV -max $maxV -step (($maxV-$minV)/100) -buttonLabel "initial" -dragCommand ("setAttr "+$ran+" #1") -buttonCommand ("setAttr "+$ran+" "+$v+"; floatSliderButtonGrp -e -value "+$v+" "+$sn) $sn ;
-   attrFieldSliderGrp -min $minV -max $maxV -at $ran ;
+   $ffA = "fsfa_" + $sls[$i] + "_" + $cb[$j] ;
+   $ffB = "fsfb_" + $sls[$i] + "_" + $cb[$j] ;
+   rowLayout -numberOfColumns 3 -backgroundColor .2 .2 .2 -rowAttach 3 both 3 -adjustableColumn 3 ;
+   $cmd = ("attrFieldSliderGrp -e -min (`floatField -q -v "+$ffA+"`) "+$sn);
+   floatField -width 40 -precision 2 -value $minV -changeCommand ($cmd) $ffA ; 
+   $cmd = ("attrFieldSliderGrp -e -max (`floatField -q -v "+$ffB+"`) "+$sn);
+   floatField -width 40 -precision 2 -value $maxV -changeCommand ($cmd) $ffB ;
+   attrFieldSliderGrp -min $minV -max $maxV -rowAttach 3 both 3 -adjustableColumn 3 -extraButton 1 -extraButtonCommand ("setAttr \""+$ran+"\" 0") -extraButtonIcon "alignUMax.png" -attribute $ran $sn ;
+   setParent..;
    $j++;
   }
   $i++ ;
