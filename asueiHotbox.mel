@@ -3,6 +3,12 @@ global proc asueiHotbox(){
  python("import sys");
  python("import maya.OpenMaya as om");
  python("import imp");
+ 
+ $dir = ` whatIs asueiHotbox ` ;
+ python("pPath = '"+$dir+"'.replace('Mel procedure found in: ','')") ;
+ python("pPath = pPath.replace('asueiHotbox.mel','')") ;
+ python("if pPath not in sys.path : sys.path.append(pPath)");
+ python("try: reload(ashb) \nexcept: import asueiHotbox as ashb");
 
  $sl = `ls -selection -objectsOnly` ;
  $eSel = 2 ; //Selected amount
@@ -15,7 +21,7 @@ global proc asueiHotbox(){
   $gc = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
   for($y in $gc){
    $nt = ` nodeType $y ` ;
-   if($nt=="skinCluster") $eSkin = 6 ;
+   if($nt=="skinCluster") $eSkin = 7 ;
    if($nt=="blendShape") $eBs = 1 ;
    if($nt=="cluster") $eCc = 1 ;
    if($nt=="textureDeformer") $eTxt = 1 ;
@@ -169,11 +175,12 @@ if($ctx=="artAttrSkinContext"){
 //   |++|       |++|
 //   |++|       |++|
 window  -titleBar 0 -widthHeight 160 120 win_DeG ;
-gridLayout -numberOfColumns 4 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_interect ;
+gridLayout -numberOfColumns 5 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_interect ;
 
 iconTextButton -style "iconAndTextCentered" -image1 "polySelectBoundary.png" -command ("as_vertexWeightCheckUI") -annotation "Vertex weight checker" ;
 iconTextButton -style "iconAndTextCentered" -image1 "bakeAnimation.png" -command ("as_attrSliderUI") -annotation "Vertex weight checker" ;
 iconTextButton -style "iconAndTextCentered" -image1 "paintSkinWeights.png" -command ("as_paintWeightTools") -annotation "Auto detect paint weight tool" ;
+iconTextButton -style "iconAndTextCentered" -image1 "annotation.png" -command ("python(\"ashb.as_naming()\")") -annotation "Rename Tool" ;
 iconTextButton -style "iconAndTextCentered" -image1 "scriptEdPersp.png" -command ("as_scriptFolderUI") -annotation "Scripts Folder" ;
 
 string $imageList[],$cmdList[] ;
@@ -186,7 +193,7 @@ $imageList[5] = "polySphere.png" ; $cmdList[5] = "polySphere -r 1 -sx 20 -sy 20 
 $imageList[6] = "polyMesh.png" ; $cmdList[6] = "polyPlane -w 10 -h 10 -sx 10 -sy 10 ;" ;
 $imageList[7] = "locator.png" ; $cmdList[7] = "spaceLocator" ;
 
-int $bc = 8 - $eSkin - $eBs - $eCc - $eCloth - $eCrv ;
+int $bc = 10 - $eSkin - $eBs - $eCc - $eCloth - $eCrv ;
 $i = 0 ;
 while($i<$bc){
  nodeIconButton -image1 $imageList[$i] -c $cmdList[$i] ;
@@ -195,6 +202,7 @@ while($i<$bc){
 window -e -resizeToFitChildren on win_DeG ;
 
 if($eSkin>0){
+ shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "interactiveBindTool.png" -noDefaultPopup -command ("python(\"ashb.vertexInferencePaintWeight()\")") ;
  nodeIconButton -bgc .15 .2 .2 -image1 "mirrorSkinWeight.png" -command ("MirrorSkinWeightsOptions") ;
  nodeIconButton -bgc .15 .2 .2 -image1 "copySkinWeight.png" -command ("CopySkinWeightsOptions") ;
  shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "art3dPaint.png" -noDefaultPopup -command ("weightHammerVerts") ;
@@ -309,7 +317,7 @@ shelfButton -noDefaultPopup -image1 "polyMirrorGeometry.png" -command ("as_mirro
  menuItem -label "Reverse Normals" -command ("ReversePolygonNormals") ;
 shelfButton -noDefaultPopup -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
 shelfButton -noDefaultPopup -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
-shelfButton -image1 "setDrivenKeyframe.png" -command ("SetDrivenKey") -annotation "Driven Key" ;
+shelfButton -image1 "cMuscle_bonus_surfAttach.png" -command ("cMuscleSurfAttachSetup()") -annotation "Surface Attach" ;
 shelfButton -noDefaultPopup -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
  popupMenu -parent ashb_nCache ;
  menuItem -label "Option" -command ("nClothCacheOpt") ;
