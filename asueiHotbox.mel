@@ -192,6 +192,8 @@ $imageList[4] = "polyCube.png" ; $cmdList[4] = "polyCube" ;
 $imageList[5] = "polySphere.png" ; $cmdList[5] = "polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;" ;
 $imageList[6] = "polyMesh.png" ; $cmdList[6] = "polyPlane -w 10 -h 10 -sx 10 -sy 10 ;" ;
 $imageList[7] = "locator.png" ; $cmdList[7] = "spaceLocator" ;
+$imageList[8] = "locator.png" ; $cmdList[8] = "spaceLocator" ;
+$imageList[9] = "locator.png" ; $cmdList[9] = "spaceLocator" ;
 
 int $bc = 10 - $eSkin - $eBs - $eCc - $eCloth - $eCrv ;
 $i = 0 ;
