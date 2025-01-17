@@ -1,7 +1,13 @@
 # encoding: utf-8
 import maya.cmds as cmds
 import maya.mel as mel
+import maya.OpenMaya as om
 import re
+from PySide2 import QtGui
+
+def mouseCursor():
+ cursorPos = QtGui.QCursor().pos()
+ return [cursorPos.x(),cursorPos.y()]
 
 def vertexInferencePaintWeight():
  sl = cmds.ls(sl=1,fl=1)
