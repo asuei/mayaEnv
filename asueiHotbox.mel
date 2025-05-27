@@ -645,9 +645,9 @@ global proc as_printThickness(){
 global proc as_transValue(int $t[],int $ro,int $s){
  $sl = `ls -selection -long` ;
  if($t[0]==1){
-  setAttr ($sl[1]+".tx") (`getAttr ($sl[0]+".tx")`*$t[1]) ;
-  setAttr ($sl[1]+".ty") (`getAttr ($sl[0]+".ty")`*$t[2]) ;
-  setAttr ($sl[1]+".tz") (`getAttr ($sl[0]+".tz")`*$t[3]) ;
+  setAttr ($sl[1]+".tx") (`getAttr ($sl[0]+".tx")`*$t[0]) ;
+  setAttr ($sl[1]+".ty") (`getAttr ($sl[0]+".ty")`*$t[1]) ;
+  setAttr ($sl[1]+".tz") (`getAttr ($sl[0]+".tz")`*$t[2]) ;
  }
  if($ro==1){
   setAttr ($sl[1]+".rx") (`getAttr ($sl[0]+".rx")`) ;
