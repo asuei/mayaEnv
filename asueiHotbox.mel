@@ -10,6 +10,13 @@ global proc asueiHotbox(){
  python("if pPath not in sys.path : sys.path.append(pPath)");
  python("import asueiHotbox as ashb");
  python("imp.reload(ashb)");
+ 
+ $cx = 960 ; $cy = 540 ;
+ $cPos = python("ashb.mouseCursor()");
+ $cx = $cPos[0]; $cy = $cPos[1];
+ print ("\nCursor coordinate is : "+$cx + ","+ $cy) ;
+ $winList = {"win_ConsG","win_DeG","win_GoC","win_GoS","win_GoOs","win_GoSet"} ;
+ for($win in $winList) if(`windowPref -exists $win`) windowPref -remove $win ;
 
  $sl = `ls -selection -objectsOnly` ;
  $eSel = 2 ; //Selected amount
@@ -59,7 +66,6 @@ global proc asueiHotbox(){
   }
  }
 
-$ith = "iconAndTextHorizontal" ;
 //==============================
 //   |++| |++++|
 //   |++|       |+++|
@@ -72,13 +78,14 @@ $ith = "iconAndTextHorizontal" ;
 //   |++| |oo|  |++|
 //   |++| |oo|  |++|
 //   |++|       |++|
-window -title "Constrain Grid" -titleBar 0 -resizeToFitChildren on win_ConsG ;
-gridLayout -numberOfColumns 1 -cellWidthHeight 130 35;
+ $ith = "iconAndTextHorizontal" ;
+ window -title "Constrain Grid" -titleBar 0 -widthHeight 1 1 -topLeftCorner ($cy-170) ($cx-150) -resizeToFitChildren on win_ConsG ;
+ gridLayout -numberOfColumns 1 -cellWidthHeight 130 35;
  nodeIconButton -style $ith -image1 "projectCurve_Poly.png" -label "nodeType" -command ("$sl = `ls -sl`; inViewMessage -smg (`nodeType $sl[0]`) -pos botCenter -bkc 0x00000000 -fade ; print (`nodeType $sl[0]`);") ;
  nodeIconButton -style $ith -image1 "pointlight.png" -label "be parentCons" -command ("as_beConstraint(1,1,0)") ashb_beCons ;
   popupMenu -parent ashb_beCons ;
-  menuItem -label "be pointCons" -command ("as_beConstraint(1,0,0)") ;
-  menuItem -label "be orientCons" -command ("as_beConstraint(0,1,0)") ;
+   menuItem -label "be pointCons" -command ("as_beConstraint(1,0,0)") ;
+   menuItem -label "be orientCons" -command ("as_beConstraint(0,1,0)") ;
  rowLayout -numberOfColumns 2 -columnWidth2 65 65 ;
   nodeIconButton -style $ith -width 65 -height 35 -label "source" -command ("as_selIoPut\(0\)") ;
   nodeIconButton -style $ith -width 65 -height 35 -label "output" -command ("as_selIoPut\(1\)") ;
@@ -86,82 +93,81 @@ gridLayout -numberOfColumns 1 -cellWidthHeight 130 35;
  nodeIconButton -style $ith -image1 "skin.png" -label "Constrain Source" -command ("as_constrainSource") ;
  nodeIconButton -style $ith -image1 "nConstraintReplaceMembers.png" -label "Delete Constrains" -command ("as_delConstrain") ;
  
-$ctx = `currentCtx`;
-//print $ctx ;
-if($ctx=="artAttrSkinContext"){
- nodeIconButton -style $ith -image1 "smoothSkinWeights.png" -label "Switch Display"-command ("as_swapArtSkin") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrSkinPaintCtx Replace; artSkinSetSelectionValue 0 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.01 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.025 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style $ith -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.1 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.9 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.99 false artAttrSkinPaintCtx artAttrSkin;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrSkinPaintCtx Smooth;") ;
- nodeIconButton -style $ith -image1 "interactiveBindTool.png" -label "Scale 0.5"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.5 false artAttrSkinPaintCtx artAttrSkin;") ;
-}else if($ctx=="artAttrContext"||$ctx=="artAttrBlendShapeContext"||$ctx=="artAttrNComponentContext"){
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrCtx Replace; artAttrCtx -e -value 0 `currentCtx`;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.01 `currentCtx`;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.025 `currentCtx`;") ;
- nodeIconButton -style $ith -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.1 `currentCtx`;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrCtx Scale; artAttrCtx -e -value 0.9 `currentCtx`;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrCtx Scale; artAttrCtx -e -value 0.99 `currentCtx`;") ;
- nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrCtx Smooth;") ;
-
-}else if($eSel==0){
- nodeIconButton -style $ith -image1 "zoomIn.png" -label "animtion key"-command ("as_animKey(\"\")") ;
- nodeIconButton -style $ith -image1 "zoomOut.png" -label "AnimObj" -command ("as_animKey(\"obj\")") ;
- nodeIconButton -style $ith -image1 "aselect.png" -label "same name node"-command ("as_sameName") ;
- nodeIconButton -style $ith -image1 "noAccess.png" -label "bindPose" -c ("as_delPose") ashBtn_dbp ;
- nodeIconButton -style $ith -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
- nodeIconButton -style $ith -image1 "Erase.png" -label "intermediate Obj" -command ("as_delImobj") ;
- nodeIconButton -style $ith -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
- nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "unknown set" -command ("as_delUnknown") as_unknown ;
- nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "lock normal" -command ("as_findLockNormal") as_lockNormal ;
- nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "unlock lambert1" -command ("lockNode -lock 0 -lockUnpublished 0 \"initialShadingGroup\" ;") ;
- if(size(`ls -type nCloth`)> 0) nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "Print Thickness" -command ("as_printThickness") as_thickness ;
- if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
- if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
-}else if($eSel==1){
- $sp = ` listRelatives -shapes -noIntermediate -path $sl ` ; // shape path
- $ip = ` listHistory -pruneDagObjects 1 -interestLevel 1 $sl ` ;
- $op = ` listHistory -pruneDagObjects 1 -interestLevel 1 -future 1 $sl ` ;
- $ap = stringArrayCatenate($sp,$ip) ;
- $ap = stringArrayCatenate($ap,$op) ;
- for($x in $ap){
-  $ic = "menuIconHelp.png" ;
-  $nt = ` nodeType $x ` ;
-  if($nt=="mesh") $ic = "polySoccerBall.png" ;
-  if($nt=="skinCluster") $ic = "substGeometry.png" ;
-  if($nt=="tweak") $ic = "interactiveBindTool.png" ;
-  nodeIconButton -style $ith -image1 $ic -label $x -c ("select -r "+$x) ;
- }
- nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "Material" -command ("as_getMetarial") as_selMate ;
-}else if($eSel==2){
- shelfButton -style $ith -image1 "posConstraint.png" -label "Point (snap)" -noDefaultPopup -command ("pointConstraint -offset 0 0 0 -weight 1") ;
- shelfButton -style $ith -image1 "orientConstraint.png" -label "Orient (snap)" -noDefaultPopup -command ("orientConstraint -offset 0 0 0 -weight 1;") ;
- rowLayout -numberOfColumns 2 -columnWidth2 90 25 ;
-  shelfButton -style $ith -image1 "parentConstraint.png" -label "Parent      " -noDefaultPopup -command ("parentConstraint -weight 1") ;
-  shelfButton -style $ith -image1 "nConstraintMembership.png" -noDefaultPopup -command ("parentConstraint -mo -weight 1") ;
- setParent ..;
- shelfButton -style $ith -image1 "scaleConstraint.png" -label "Scale (snap)" -noDefaultPopup -command ("doCreateScaleConstraintArgList 1 { \"0\",\"1\",\"1\",\"1\",\"0\",\"0\",\"0\",\"1\",\"\",\"1\" };") ;
- shelfButton -style $ith -image1 "aimConstraint.png" -label "Aim Option" -noDefaultPopup -command ("AimConstraintOptions;") ;
- rowLayout -numberOfColumns 3 -columnWidth3 65 34 25 ;
-  shelfButton -style $ith -image1 "render_decomposeMatrix.png" -label "trans" -noDefaultPopup -command ("as_transValue({1,1,1,1},0,0)") ashb_tvt ;
-   popupMenu -parent ashb_tvt ;
-   menuItem -label "minus" -command ("as_transValue({1,-1,-1,-1},0,0)") ;
-   menuItem -label "minus x only" -command ("as_transValue({1,-1,1,1},0,0)") ;
-  shelfButton -style "textOnly" -label "rotate" -height 35 -noDefaultPopup -command ("as_transValue({0},1,0)") ;
-  shelfButton -style "textOnly" -label "scale" -height 35 -noDefaultPopup -command ("as_transValue({0},0,1)") ;
+ $ctx = `currentCtx`;
+ //print $ctx ;
+ if($ctx=="artAttrSkinContext"){
+  nodeIconButton -style $ith -image1 "smoothSkinWeights.png" -label "Switch Display"-command ("as_swapArtSkin") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrSkinPaintCtx Replace; artSkinSetSelectionValue 0 false artAttrSkinPaintCtx artAttrSkin;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.01 false artAttrSkinPaintCtx artAttrSkin;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.025 false artAttrSkinPaintCtx artAttrSkin;") ;
+  nodeIconButton -style $ith -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrSkinPaintCtx Add; artSkinSetSelectionValue 0.1 false artAttrSkinPaintCtx artAttrSkin;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.9 false artAttrSkinPaintCtx artAttrSkin;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.99 false artAttrSkinPaintCtx artAttrSkin;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrSkinPaintCtx Smooth;") ;
+  nodeIconButton -style $ith -image1 "interactiveBindTool.png" -label "Scale 0.5"-command ("artAttrPaintOperation artAttrSkinPaintCtx Scale; artSkinSetSelectionValue 0.5 false artAttrSkinPaintCtx artAttrSkin;") ;
+ }else if($ctx=="artAttrContext"||$ctx=="artAttrBlendShapeContext"||$ctx=="artAttrNComponentContext"){
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Replace 0"-command ("artAttrPaintOperation artAttrCtx Replace; artAttrCtx -e -value 0 `currentCtx`;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.01"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.01 `currentCtx`;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Add 0.025"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.025 `currentCtx`;") ;
+  nodeIconButton -style $ith -image1 "interactiveBindTool.png" -label "Add 0.1"-command ("artAttrPaintOperation artAttrCtx Add; artAttrCtx -e -value 0.1 `currentCtx`;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.9"-command ("artAttrPaintOperation artAttrCtx Scale; artAttrCtx -e -value 0.9 `currentCtx`;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Scale 0.99"-command ("artAttrPaintOperation artAttrCtx Scale; artAttrCtx -e -value 0.99 `currentCtx`;") ;
+  nodeIconButton -style $ith -image1 "paintSkinWeights.png" -label "Smooth"-command ("artAttrPaintOperation artAttrCtx Smooth;") ;
+ }else if($eSel==0){
+  nodeIconButton -style $ith -image1 "zoomIn.png" -label "animtion key"-command ("as_animKey(\"\")") ;
+  nodeIconButton -style $ith -image1 "zoomOut.png" -label "AnimObj" -command ("as_animKey(\"obj\")") ;
+  nodeIconButton -style $ith -image1 "aselect.png" -label "same name node"-command ("as_sameName") ;
+  nodeIconButton -style $ith -image1 "noAccess.png" -label "bindPose" -c ("as_delPose") ashBtn_dbp ;
+  nodeIconButton -style $ith -image1 "noAccess.png" -label "turtle" -command ("as_turtleLayer") ashBtn_dtt ;
+  nodeIconButton -style $ith -image1 "Erase.png" -label "intermediate Obj" -command ("as_delImobj") ;
+  nodeIconButton -style $ith -image1 "noAccess.png" -label "unused node" -command ("MLdeleteUnused") ;
+  nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "unknown set" -command ("as_delUnknown") as_unknown ;
+  nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "lock normal" -command ("as_findLockNormal") as_lockNormal ;
+  nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "unlock lambert1" -command ("lockNode -lock 0 -lockUnpublished 0 \"initialShadingGroup\" ;") ;
+  if(size(`ls -type nCloth`)> 0) nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "Print Thickness" -command ("as_printThickness") as_thickness ;
+  if(size(` ls -type dagPose`)==0) nodeIconButton -e -enable 0 ashBtn_dbp ;
+  if(`objExists TurtleDefaultBakeLayer`==0) nodeIconButton -e -enable 0 ashBtn_dtt ;
+ }else if($eSel==1){
+  $sp = ` listRelatives -shapes -noIntermediate -path $sl ` ; // shape path
+  $ip = ` listHistory -pruneDagObjects 1 -interestLevel 1 $sl ` ;
+  $op = ` listHistory -pruneDagObjects 1 -interestLevel 1 -future 1 $sl ` ;
+  $ap = stringArrayCatenate($sp,$ip) ;
+  $ap = stringArrayCatenate($ap,$op) ;
+  for($x in $ap){
+   $ic = "menuIconHelp.png" ;
+   $nt = ` nodeType $x ` ;
+   if($nt=="mesh") $ic = "polySoccerBall.png" ;
+   if($nt=="skinCluster") $ic = "substGeometry.png" ;
+   if($nt=="tweak") $ic = "interactiveBindTool.png" ;
+   nodeIconButton -style $ith -image1 $ic -label $x -c ("select -r "+$x) ;
+  }
+  nodeIconButton -style $ith -image1 "menuIconHelp.png" -label "Material" -command ("as_getMetarial") as_selMate ;
+ }else if($eSel==2){
+  shelfButton -style $ith -image1 "posConstraint.png" -label "Point (snap)" -noDefaultPopup -command ("pointConstraint -offset 0 0 0 -weight 1") ;
+  shelfButton -style $ith -image1 "orientConstraint.png" -label "Orient (snap)" -noDefaultPopup -command ("orientConstraint -offset 0 0 0 -weight 1;") ;
+  rowLayout -numberOfColumns 2 -columnWidth2 90 25 ;
+   shelfButton -style $ith -image1 "parentConstraint.png" -label "Parent      " -noDefaultPopup -command ("parentConstraint -weight 1") ;
+   shelfButton -style $ith -image1 "nConstraintMembership.png" -noDefaultPopup -command ("parentConstraint -mo -weight 1") ;
   setParent ..;
- //nodeIconButton -style $ith -image1 "posDrag.png" -label "Matrix" -command ("as_matrixCons") ashb_mc ;
- shelfButton -style $ith -image1 "motionPathKey.png" -label "Matrix Space" -noDefaultPopup -command ("as_matrixSpace(0)") ashb_mc ;
-  popupMenu -parent ashb_mc ;
-  menuItem -label "Local" -command ("as_matrixSpace(1)") ;
-  menuItem -label "Matrix Space (maintainOffset)" -command ("as_matrixOffset; as_matrixSpace(0);") ;
- shelfButton -style $ith -image1 "polyMerge.png" -label "connect mesh" -noDefaultPopup -command ("as_connectMesh") ;
- shelfButton -style $ith -image1 "motionPath.png" -label "MatCons (offset)" -noDefaultPopup -command ("as_matrixCons(0)") ;
- shelfButton -style $ith -image1 "flowPathObj.png" -label "MatCons (trans)" -noDefaultPopup -command ("as_matrixCons(1)") ;
-}
+  shelfButton -style $ith -image1 "scaleConstraint.png" -label "Scale (snap)" -noDefaultPopup -command ("doCreateScaleConstraintArgList 1 { \"0\",\"1\",\"1\",\"1\",\"0\",\"0\",\"0\",\"1\",\"\",\"1\" };") ;
+  shelfButton -style $ith -image1 "aimConstraint.png" -label "Aim Option" -noDefaultPopup -command ("AimConstraintOptions;") ;
+  rowLayout -numberOfColumns 3 -columnWidth3 65 34 25 ;
+   shelfButton -style $ith -image1 "render_decomposeMatrix.png" -label "trans" -noDefaultPopup -command ("as_transValue({1,1,1,1},0,0)") ashb_tvt ;
+    popupMenu -parent ashb_tvt ;
+     menuItem -label "minus" -command ("as_transValue({1,-1,-1,-1},0,0)") ;
+     menuItem -label "minus x only" -command ("as_transValue({1,-1,1,1},0,0)") ;
+   shelfButton -style "textOnly" -label "rotate" -height 35 -noDefaultPopup -command ("as_transValue({0},1,0)") ;
+   shelfButton -style "textOnly" -label "scale" -height 35 -noDefaultPopup -command ("as_transValue({0},0,1)") ;
+   setParent ..;
+  //nodeIconButton -style $ith -image1 "posDrag.png" -label "Matrix" -command ("as_matrixCons") ashb_mc ;
+  shelfButton -style $ith -image1 "motionPathKey.png" -label "Matrix Space" -noDefaultPopup -command ("as_matrixSpace(0)") ashb_mc ;
+   popupMenu -parent ashb_mc ;
+    menuItem -label "Local" -command ("as_matrixSpace(1)") ;
+    menuItem -label "Matrix Space (maintainOffset)" -command ("as_matrixOffset; as_matrixSpace(0);") ;
+  shelfButton -style $ith -image1 "polyMerge.png" -label "connect mesh" -noDefaultPopup -command ("as_connectMesh") ;
+  shelfButton -style $ith -image1 "motionPath.png" -label "MatCons (offset)" -noDefaultPopup -command ("as_matrixCons(0)") ;
+  shelfButton -style $ith -image1 "flowPathObj.png" -label "MatCons (trans)" -noDefaultPopup -command ("as_matrixCons(1)") ;
+ }
 
 
 //==============================
@@ -175,34 +181,33 @@ if($ctx=="artAttrSkinContext"){
 //   |++| |++|  |++|
 //   |++|       |++|
 //   |++|       |++|
-window  -titleBar 0 -widthHeight 160 120 win_DeG ;
-gridLayout -numberOfColumns 5 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_interect ;
+ window  -titleBar 0 -widthHeight 1 1 -topLeftCorner ($cy-170) ($cx+5) -resizeToFitChildren on win_DeG ;
+ gridLayout -numberOfColumns 5 -cellWidthHeight 50 50 -bgc 0.2 0.2 0.22 grid_interect ;
 
-iconTextButton -style "iconAndTextCentered" -image1 "polySelectBoundary.png" -command ("as_vertexWeightCheckUI") -annotation "Vertex weight checker" ;
-iconTextButton -style "iconAndTextCentered" -image1 "bakeAnimation.png" -command ("as_attrSliderUI") -annotation "Vertex weight checker" ;
-iconTextButton -style "iconAndTextCentered" -image1 "paintSkinWeights.png" -command ("as_paintWeightTools") -annotation "Auto detect paint weight tool" ;
-iconTextButton -style "iconAndTextCentered" -image1 "annotation.png" -command ("python(\"ashb.as_naming()\")") -annotation "Rename Tool" ;
-iconTextButton -style "iconAndTextCentered" -image1 "scriptEdPersp.png" -command ("as_scriptFolderUI") -annotation "Scripts Folder" ;
+ iconTextButton -style "iconAndTextCentered" -image1 "polySelectBoundary.png" -command ("as_vertexWeightCheckUI") -annotation "Vertex weight checker" ;
+ iconTextButton -style "iconAndTextCentered" -image1 "bakeAnimation.png" -command ("as_attrSliderUI") -annotation "Vertex weight checker" ;
+ iconTextButton -style "iconAndTextCentered" -image1 "paintSkinWeights.png" -command ("as_paintWeightTools") -annotation "Auto detect paint weight tool" ;
+ iconTextButton -style "iconAndTextCentered" -image1 "annotation.png" -command ("python(\"ashb.as_naming()\")") -annotation "Rename Tool" ;
+ iconTextButton -style "iconAndTextCentered" -image1 "scriptEdPersp.png" -command ("as_scriptFolderUI") -annotation "Scripts Folder" ;
 
-string $imageList[],$cmdList[] ;
-$imageList[0] = "circle.png" ; $cmdList[0] = "circle" ;
-$imageList[1] = "curveCV.png" ; $cmdList[1] = "CVCurveTool" ;
-$imageList[2] = "curveEP.png" ; $cmdList[2] = "EPCurveTool" ;
-$imageList[3] = "modifyCurl.png" ; $cmdList[3] = "curveLocator" ;
-$imageList[4] = "polyCube.png" ; $cmdList[4] = "polyCube" ;
-$imageList[5] = "polySphere.png" ; $cmdList[5] = "polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;" ;
-$imageList[6] = "polyMesh.png" ; $cmdList[6] = "polyPlane -w 10 -h 10 -sx 10 -sy 10 ;" ;
-$imageList[7] = "locator.png" ; $cmdList[7] = "spaceLocator" ;
-$imageList[8] = "locator.png" ; $cmdList[8] = "spaceLocator" ;
-$imageList[9] = "locator.png" ; $cmdList[9] = "spaceLocator" ;
+ string $imageList[],$cmdList[] ;
+ $imageList[0] = "circle.png" ; $cmdList[0] = "circle" ;
+ $imageList[1] = "curveCV.png" ; $cmdList[1] = "CVCurveTool" ;
+ $imageList[2] = "curveEP.png" ; $cmdList[2] = "EPCurveTool" ;
+ $imageList[3] = "modifyCurl.png" ; $cmdList[3] = "curveLocator" ;
+ $imageList[4] = "polyCube.png" ; $cmdList[4] = "polyCube" ;
+ $imageList[5] = "polySphere.png" ; $cmdList[5] = "polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;" ;
+ $imageList[6] = "polyMesh.png" ; $cmdList[6] = "polyPlane -w 10 -h 10 -sx 10 -sy 10 ;" ;
+ $imageList[7] = "locator.png" ; $cmdList[7] = "spaceLocator" ;
+ $imageList[8] = "locator.png" ; $cmdList[8] = "spaceLocator" ;
+ $imageList[9] = "locator.png" ; $cmdList[9] = "spaceLocator" ;
 
-int $bc = 10 - $eSkin - $eBs - $eCc - $eCloth - $eCrv ;
-$i = 0 ;
-while($i<$bc){
- nodeIconButton -image1 $imageList[$i] -c $cmdList[$i] ;
- $i++ ;
-}
-window -e -resizeToFitChildren on win_DeG ;
+ int $bc = 10 - $eSkin - $eBs - $eCc - $eCloth - $eCrv ;
+ $i = 0 ;
+ while($i<$bc){
+  nodeIconButton -image1 $imageList[$i] -c $cmdList[$i] ;
+  $i++ ;
+ }
 
 if($eSkin>0){
  shelfButton -style "iconOnly" -bgc .15 .2 .2 -image1 "interactiveBindTool.png" -noDefaultPopup -command ("python(\"ashb.vertexInferencePaintWeight()\")") ;
@@ -232,29 +237,28 @@ if($eCrv>0){
 //   |++| |++|  |++|
 //   |++|       |++|
 //   |++|       |++|
-window -title "Grid of Show" -titleBar 0 -widthHeight 280 40 win_GoS ;
-gridLayout -numberOfColumns 7 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
+ window -title "Grid of Show" -titleBar 0 -widthHeight 1 1 -topLeftCorner ($cy-240) ($cx-150) -resizeToFitChildren on win_GoS ;
+ gridLayout -numberOfColumns 7 -cellWidthHeight 40 40 -bgc 0.2 0.21 0.21 ;
 
-$asfw = `getPanel -withFocus` ;
-global int $meJo ;
-iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;ToggleObjectDetails;") ashb_pc ;
- popupMenu -parent ashb_pc ;
- menuItem -label "reset UI Position" -command ("as_resetUiPos()") ;
- menuItem -label "Add attributes" -command ("as_attrHub()") ;
- menuItem -label "Rmove attributes" -command ("as_attrHubRemove()") ;
-iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashb_sfr ;
- popupMenu -parent ashb_sfr ;
- menuItem -label "abc Range" -command ("as_abcRange") ;
-iconTextButton -style "textOnly" -label "cam\nPref" -c ("as_camPref()") ashb_camRref ;
-iconTextButton -style "textOnly" -label "joint" -c ("if($meJo==0){ modelEditor -e -joints 1 modelPanel4; $meJo=1; } else { modelEditor -e -joints 0 modelPanel4; $meJo=0; }") ;
-iconTextButton -style "textOnly" -label "farClip" -c ("as_nfClip(0)") ashb_clip ;
- popupMenu -parent ashb_clip ;
- menuItem -label "x 0.1" -command ("as_nfClip(1)") ;
-iconTextButton -style "textOnly" -label "show\nall" -c ("modelEditor -e -allObjects 1 "+$asfw) ;
-iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true -strokes true "+$asfw) ashb_cView ;
- popupMenu -parent ashb_cView ;
- menuItem -label "No Strokes" -command ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true "+$asfw) ;
-window -e -resizeToFitChildren on win_GoS ;
+ $asfw = `getPanel -withFocus` ;
+ global int $meJo ;
+ iconTextButton -style "textOnly" -label "HUD" -c ("TogglePolyCount;ToggleFocalLength;ToggleCurrentFrame;ToggleObjectDetails;") ashb_pc ;
+  popupMenu -parent ashb_pc ;
+   menuItem -label "reset UI Position" -command ("as_resetUiPos()") ;
+   menuItem -label "Add attributes" -command ("as_attrHub()") ;
+   menuItem -label "Rmove attributes" -command ("as_attrHubRemove()") ;
+ iconTextButton -style "iconAndTextCentered" -label "frame\nrange" -c ("playbackOptions -minTime (`getAttr \"defaultRenderGlobals.startFrame\"`) ; playbackOptions -maxTime (`getAttr \"defaultRenderGlobals.endFrame\"`) ;") ashb_sfr ;
+  popupMenu -parent ashb_sfr ;
+  menuItem -label "abc Range" -command ("as_abcRange") ;
+ iconTextButton -style "textOnly" -label "cam\nPref" -c ("as_camPref()") ashb_camRref ;
+ iconTextButton -style "textOnly" -label "joint" -c ("if($meJo==0){ modelEditor -e -joints 1 modelPanel4; $meJo=1; } else { modelEditor -e -joints 0 modelPanel4; $meJo=0; }") ;
+ iconTextButton -style "textOnly" -label "farClip" -c ("as_nfClip(0)") ashb_clip ;
+  popupMenu -parent ashb_clip ;
+   menuItem -label "x 0.1" -command ("as_nfClip(1)") ;
+ iconTextButton -style "textOnly" -label "show\nall" -c ("modelEditor -e -allObjects 1 "+$asfw) ;
+ iconTextButton -style "textOnly" -label "show\nview" -c ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true -strokes true "+$asfw) ashb_cView ;
+  popupMenu -parent ashb_cView ;
+   menuItem -label "No Strokes" -command ("modelEditor -e -allObjects 0 -nurbsSurfaces true -polymeshes true "+$asfw) ;
 
 //==============================
 //   |oo|   |+++++|
@@ -267,65 +271,65 @@ window -e -resizeToFitChildren on win_GoS ;
 //   |oo| |++|  |++|
 //   |oo|       |++|
 //   |oo|       |++|
-window -title "Grid of Objects" -titleBar 0 -resizeToFitChildren on win_GoOs ;
-gridLayout -numberOfColumns 2 -cellWidthHeight 45 45 -bgc 0.21 0.21 0.2 ;
+ window -title "Grid of Objects" -titleBar 0 -widthHeight 1 1 -topLeftCorner ($cy-250) ($cx-265) -resizeToFitChildren on win_GoOs ;
+ gridLayout -numberOfColumns 2 -cellWidthHeight 45 45 -bgc 0.21 0.21 0.2 ;
 
-shelfButton -noDefaultPopup -image1 "create.png" -c ("as_posLocator") -annotation "Locator at select transform." ;
-shelfButton -noDefaultPopup -image1 "toonToPolygons.png" -command ("as_copyPivot") -annotation "Copy Pivot." ashb_cp ;
-shelfButton -noDefaultPopup -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation "Create parent transform." ashb_cpt ;
- popupMenu -parent ashb_cpt ;
- menuItem -label "ctrl_ ctrlTrans_" -command ("as_trans(\"ctrl_\",\"ctrlTrans_\")") ;
- menuItem -label "_ctrl _ctrlEnv" -command ("as_trans(\"_ctrl\",\"_ctrlEnv\")") ;
-shelfButton -noDefaultPopup -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
-shelfButton -noDefaultPopup -image1 "polyCircularize.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
-shelfButton -noDefaultPopup -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
-shelfButton -noDefaultPopup -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ashb_jo ;
- popupMenu -parent ashb_jo ;
- menuItem -label "orderID" -command ("as_orderID") ;
-shelfButton -noDefaultPopup -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashb_ikh ;
- popupMenu -parent ashb_ikh ;
- menuItem -label "spline IK Tool" -command ("IKSplineHandleToolOptions") ;
-shelfButton -noDefaultPopup -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ashb_sbs ;
- popupMenu -parent ashb_sbs ;
- menuItem -label "Rebind" -command ("as_rebind") ;
-shelfButton -noDefaultPopup -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
- popupMenu -parent ashb_ai ;
- menuItem -label "remove influence" -command ("RemoveInfluence") ;
-shelfButton -style "iconOnly" -image1 "blendShape.png" -label "blendShape" -noDefaultPopup -command ("as_setOrigBsKey(0)") ashb_bs ;
- popupMenu -parent ashb_bs ;
- menuItem -label "Origin World" -command ("as_setOrigBsKey(1)") ;
- menuItem -label "create BS and set key" -command ("as_setOrigBsKey(2)") ;
-shelfButton -noDefaultPopup -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -noBackground 1 -annotation "Add blendShape." ashb_bsp ;
- popupMenu -parent ashb_bsp ;
- menuItem -label "remove blendShape" -command ("RemoveBlendShape") ;
-shelfButton -noDefaultPopup -image1 "setEdit.png" -command ("EditMembershipTool") -annotation "Edit membership tool" ;
-shelfButton -image1 "cluster.png" -noDefaultPopup -command ("as_cluster(1)") -annotation "cluster" ashb_cc ;
- popupMenu -parent ashb_cc ;
- menuItem -label "Each One" -command ("as_cluster(2)") ;
-shelfButton -noDefaultPopup -image1 "wire.png" -command ("wireContext -e -dropoffDistance 100 wireCtx; WireTool;") -annotation "wire tool" ;
-shelfButton -noDefaultPopup -image1 "lattice.png" -command ("lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 ;") -annotation "lattice" ashb_ffd ;
- popupMenu -parent ashb_ffd ;
- menuItem -label "Each One" -command ("for($x in `ls -sl`) lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 $x ;") ;
-shelfButton -noDefaultPopup -image1 "wrap.png" -command ("doWrapArgList \"3\" {\"1\",\"0\",\"5\",\"2\"};") -annotation "wrap" ;
-shelfButton -noDefaultPopup -image1 "input.png" -command ("as_reorderHistory(1)") -annotation "Reorder History." ashb_reHis ;
- popupMenu -parent ashb_reHis ;
- menuItem -label "Order 2" -command ("as_reorderHistory(2)") ;
-iconTextButton -image1 "nClothDisplayInput.png" -command ("as_cancelImo") -annotation "Set intermediate to 0." ;
+ shelfButton -noDefaultPopup -image1 "create.png" -c ("as_posLocator") -annotation "Locator at select transform." ;
+ shelfButton -noDefaultPopup -image1 "toonToPolygons.png" -command ("as_copyPivot") -annotation "Copy Pivot." ashb_cp ;
+ shelfButton -noDefaultPopup -image1 "menuIconHelp.png" -c ("as_trans(\"\",\"\")") -annotation "Create parent transform." ashb_cpt ;
+  popupMenu -parent ashb_cpt ;
+   menuItem -label "ctrl_ ctrlTrans_" -command ("as_trans(\"ctrl_\",\"ctrlTrans_\")") ;
+   menuItem -label "_ctrl _ctrlEnv" -command ("as_trans(\"_ctrl\",\"_ctrlEnv\")") ;
+ shelfButton -noDefaultPopup -image1 "polyFlipEdge.png" -command ("as_duplucateConnect") -annotation "polyDuplicateAndConnect." ;
+ shelfButton -noDefaultPopup -image1 "polyCircularize.png" -command ("as_pureDupli") -annotation "polyDuplicate original mesh." ;
+ shelfButton -noDefaultPopup -image1 "view.png" -command ("as_moveToLook") -annotation "Put a joint into selected transform." ;
+ shelfButton -noDefaultPopup -image1 "kinJoint.png" -command ("as_createJoint") -annotation "Create joint and transform or put into selected transform." ashb_jo ;
+  popupMenu -parent ashb_jo ;
+   menuItem -label "orderID" -command ("as_orderID") ;
+ shelfButton -noDefaultPopup -image1 "kinHandle.png" -command ("IKHandleTool") -annotation "IK Handle Tool." -noBackground 1 ashb_ikh ;
+  popupMenu -parent ashb_ikh ;
+  menuItem -label "spline IK Tool" -command ("IKSplineHandleToolOptions") ;
+ shelfButton -noDefaultPopup -image1 "smoothSkin.png" -command ("as_smoothBindSkin") -annotation "Smooth Bind Skin" ashb_sbs ;
+  popupMenu -parent ashb_sbs ;
+   menuItem -label "Rebind" -command ("as_rebind") ;
+ shelfButton -noDefaultPopup -image1 "addWrapInfluence.png" -command ("AddInfluenceOptions") -annotation "Add influence" -noBackground 1 ashb_ai ;
+  popupMenu -parent ashb_ai ;
+   menuItem -label "remove influence" -command ("RemoveInfluence") ;
+ shelfButton -style "iconOnly" -image1 "blendShape.png" -label "blendShape" -noDefaultPopup -command ("as_setOrigBsKey(0)") ashb_bs ;
+  popupMenu -parent ashb_bs ;
+   menuItem -label "Origin World" -command ("as_setOrigBsKey(1)") ;
+   menuItem -label "create BS and set key" -command ("as_setOrigBsKey(2)") ;
+ shelfButton -noDefaultPopup -image1 "blendShapePlus.png" -command ("AddBlendShapeOptions;") -noBackground 1 -annotation "Add blendShape." ashb_bsp ;
+  popupMenu -parent ashb_bsp ;
+   menuItem -label "remove blendShape" -command ("RemoveBlendShape") ;
+ shelfButton -noDefaultPopup -image1 "setEdit.png" -command ("EditMembershipTool") -annotation "Edit membership tool" ;
+ shelfButton -image1 "cluster.png" -noDefaultPopup -command ("as_cluster(1)") -annotation "cluster" ashb_cc ;
+  popupMenu -parent ashb_cc ;
+   menuItem -label "Each One" -command ("as_cluster(2)") ;
+ shelfButton -noDefaultPopup -image1 "wire.png" -command ("wireContext -e -dropoffDistance 100 wireCtx; WireTool;") -annotation "wire tool" ;
+ shelfButton -noDefaultPopup -image1 "lattice.png" -command ("lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 ;") -annotation "lattice" ashb_ffd ;
+  popupMenu -parent ashb_ffd ;
+   menuItem -label "Each One" -command ("for($x in `ls -sl`) lattice -divisions 2 2 2 -objectCentered 1 -outsideLattice 1 $x ;") ;
+ shelfButton -noDefaultPopup -image1 "wrap.png" -command ("doWrapArgList \"3\" {\"1\",\"0\",\"5\",\"2\"};") -annotation "wrap" ;
+ shelfButton -noDefaultPopup -image1 "input.png" -command ("as_reorderHistory(1)") -annotation "Reorder History." ashb_reHis ;
+  popupMenu -parent ashb_reHis ;
+   menuItem -label "Order 2" -command ("as_reorderHistory(2)") ;
+ iconTextButton -image1 "nClothDisplayInput.png" -command ("as_cancelImo") -annotation "Set intermediate to 0." ;
 //iconTextButton -style "iconAndTextCentered" -image1 "moveNormal.png" -command ("MoveNormalTool") -annotation "Move Normal Tool" ;
-shelfButton -noDefaultPopup -image1 "copySkinWeight.png" -command ("as_copySkinCluster") -annotation "Copy skinCluster" ;
-shelfButton -noDefaultPopup -image1 "flyThroughCursor.png" -command ("ungroup") -annotation "Ungroup" ;
-shelfButton -noDefaultPopup -image1 "polyMirrorGeometry.png" -command ("as_mirrorPoint(0)") -annotation "Mirror varied point" ashb_mrp ;
- popupMenu -parent ashb_mrp ;
- menuItem -label "Mirror worldSpace" -command ("as_mirrorPoint(1)") ;
- menuItem -label "Reverse Normals" -command ("ReversePolygonNormals") ;
-shelfButton -noDefaultPopup -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
-shelfButton -noDefaultPopup -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
-shelfButton -image1 "cMuscle_bonus_surfAttach.png" -command ("cMuscleSurfAttachSetup()") -annotation "Surface Attach" ;
-shelfButton -noDefaultPopup -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
- popupMenu -parent ashb_nCache ;
- menuItem -label "Option" -command ("nClothCacheOpt") ;
- menuItem -label "Delete nCloth cache" -command ("deleteNclothCache") ;
- menuItem -label "Identify nCache" -command ("as_identifyNCache") ;
+ shelfButton -noDefaultPopup -image1 "copySkinWeight.png" -command ("as_copySkinCluster") -annotation "Copy skinCluster" ;
+ shelfButton -noDefaultPopup -image1 "flyThroughCursor.png" -command ("ungroup") -annotation "Ungroup" ;
+ shelfButton -noDefaultPopup -image1 "polyMirrorGeometry.png" -command ("as_mirrorPoint(0)") -annotation "Mirror varied point" ashb_mrp ;
+  popupMenu -parent ashb_mrp ;
+   menuItem -label "Mirror worldSpace" -command ("as_mirrorPoint(1)") ;
+   menuItem -label "Reverse Normals" -command ("ReversePolygonNormals") ;
+ shelfButton -noDefaultPopup -image1 "render_lambert.png" -annotation "Assign lambert1" -command ("sets -e -forceElement initialShadingGroup (`ls -sl`) ;") ;
+ shelfButton -noDefaultPopup -image1 "render_layeredShader.png" -command ("as_transMaterial") -annotation "Transfer Material" ;
+ shelfButton -image1 "cMuscle_bonus_surfAttach.png" -command ("cMuscleSurfAttachSetup()") -annotation "Surface Attach" ;
+ shelfButton -noDefaultPopup -image1 "nClothCreate.png" -command ("doCreateNCloth 1") -annotation "Create nCloth cache" ashb_nCache ;
+  popupMenu -parent ashb_nCache ;
+   menuItem -label "Option" -command ("nClothCacheOpt") ;
+   menuItem -label "Delete nCloth cache" -command ("deleteNclothCache") ;
+   menuItem -label "Identify nCache" -command ("as_identifyNCache") ;
 
 //==============================
 //   |++|   |+++++|
@@ -338,46 +342,46 @@ shelfButton -noDefaultPopup -image1 "nClothCreate.png" -command ("doCreateNCloth
 //   |++| |++|  |++|
 //   |++|       |++|
 //   |++|       |++|
-window -title "Grid of Setting" -titleBar 0 -widthHeight 1000 10 -resizeToFitChildren on win_GoSet ;
-gridLayout -numberOfColumns 5 -cellWidthHeight 45 45 -bgc 0.22 0.2 0.2 ;
+ window -title "Grid of Setting" -titleBar 0 -widthHeight 1 1 -topLeftCorner ($cy+3) ($cx+3) -resizeToFitChildren on win_GoSet ;
+ gridLayout -numberOfColumns 5 -cellWidthHeight 45 45 -bgc 0.22 0.2 0.2 ;
 
-iconTextButton -style "iconAndTextCentered" -image1 "setKeyframe.png" -label "" -command ("as_setTestKey") ashb_testKey ;
- popupMenu -parent ashb_testKey ;
- menuItem -label "clean key" -c ("as_cleanKey(0)") ;
-shelfButton -image1 "setDrivenKeyframe.png" -command ("SetDrivenKey") -annotation "Driven Key" ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "set\nAttr" -command ("as_attrZero(-1)") ashb_zero ;
- popupMenu -parent ashb_zero ;
- menuItem -label "round 2 decimal" -c ("as_attrZero(2)") ;
- menuItem -label "round 1 decimal" -c ("as_attrZero(1)") ;
- menuItem -label "round 0 decimal" -c ("as_attrZero(0)") ;
- menuItem -label "Reveal Rotate" -c ("as_zeroJointOrient") ;
- menuItem -label "Zero Rotate (set jointOrient)" -c ("as_zeroJointRotate") ;
- menuItem -label "Set Default Value" -c ("as_setDefaultValue") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "open\nAttr" -command ("as_attrDefault") ashb_open ;
- popupMenu -parent ashb_open ;
- menuItem -label "lock\nAttr" -c ("as_LockAttr") ;
- menuItem -label "Prefer angle and Rotate orient" -c ("as_LockPreferOrient") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "add\nAttr" -command ("as_LockAttr") ashb_ada ;
- popupMenu -parent ashb_ada ;
- menuItem -label "QuatX" -c ("as_quatRot(\"X\")") ;
- menuItem -label "QuatY" -c ("as_quatRot(\"Y\")") ;
- menuItem -label "QuatZ" -c ("as_quatRot(\"Z\")") ;
-iconTextButton -style "iconAndTextCentered" -image1 "flow.png" -label "" -command ("sets `ls -sl`;") ;
-iconTextButton -style "iconAndTextCentered" -image1 "flowSurface.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -add $sl[size($sl)-1] $sl2 ;") ;
-iconTextButton -style "iconAndTextCentered" -image1 "flowSurfaceDelete.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -remove $sl[size($sl)-1]  ;") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Ex" -command ("as_quickExIm(0)") ashb_qe ;
- popupMenu -parent ashb_qe ;
- menuItem -label "Export Selection" -c ("as_selectionExIm(0)") ;
- menuItem -label "Export skin weight" -c ("as_skinWeightExIm(0)") ;
- menuItem -label "Export animation key" -c ("as_animExIm(0)") ;
- menuItem -label "Export Sets" -c ("as_setsExIm(0)") ;
-iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im" -command ("as_quickExIm(1)") ashb_qi ;
- popupMenu -parent ashb_qi ;
- menuItem -label "Import Selection" -c ("as_selectionExIm(1)") ;
- menuItem -label "Import skin weight" -c ("as_skinWeightExIm(1)") ;
- menuItem -label "Import skin weight by vertex" -c ("as_skinWeightExIm(2)") ;
- menuItem -label "Import animation key" -c ("as_animExIm(1)") ;
- menuItem -label "Import Sets" -c ("as_setsExIm(1)") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "setKeyframe.png" -label "" -command ("as_setTestKey") ashb_testKey ;
+  popupMenu -parent ashb_testKey ;
+   menuItem -label "clean key" -c ("as_cleanKey(0)") ;
+ shelfButton -image1 "setDrivenKeyframe.png" -command ("SetDrivenKey") -annotation "Driven Key" ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "set\nAttr" -command ("as_attrZero(-1)") ashb_zero ;
+  popupMenu -parent ashb_zero ;
+   menuItem -label "round 2 decimal" -c ("as_attrZero(2)") ;
+   menuItem -label "round 1 decimal" -c ("as_attrZero(1)") ;
+   menuItem -label "round 0 decimal" -c ("as_attrZero(0)") ;
+   menuItem -label "Reveal Rotate" -c ("as_zeroJointOrient") ;
+   menuItem -label "Zero Rotate (set jointOrient)" -c ("as_zeroJointRotate") ;
+   menuItem -label "Set Default Value" -c ("as_setDefaultValue") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "open\nAttr" -command ("as_attrDefault") ashb_open ;
+  popupMenu -parent ashb_open ;
+   menuItem -label "lock\nAttr" -c ("as_LockAttr") ;
+   menuItem -label "Prefer angle and Rotate orient" -c ("as_LockPreferOrient") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "add\nAttr" -command ("as_LockAttr") ashb_ada ;
+  popupMenu -parent ashb_ada ;
+   menuItem -label "QuatX" -c ("as_quatRot(\"X\")") ;
+   menuItem -label "QuatY" -c ("as_quatRot(\"Y\")") ;
+   menuItem -label "QuatZ" -c ("as_quatRot(\"Z\")") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "flow.png" -label "" -command ("sets `ls -sl`;") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "flowSurface.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -add $sl[size($sl)-1] $sl2 ;") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "flowSurfaceDelete.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -remove $sl[size($sl)-1]  ;") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Ex" -command ("as_quickExIm(0)") ashb_qe ;
+  popupMenu -parent ashb_qe ;
+   menuItem -label "Export Selection" -c ("as_selectionExIm(0)") ;
+   menuItem -label "Export skin weight" -c ("as_skinWeightExIm(0)") ;
+   menuItem -label "Export animation key" -c ("as_animExIm(0)") ;
+   menuItem -label "Export Sets" -c ("as_setsExIm(0)") ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im" -command ("as_quickExIm(1)") ashb_qi ;
+  popupMenu -parent ashb_qi ;
+   menuItem -label "Import Selection" -c ("as_selectionExIm(1)") ;
+   menuItem -label "Import skin weight" -c ("as_skinWeightExIm(1)") ;
+   menuItem -label "Import skin weight by vertex" -c ("as_skinWeightExIm(2)") ;
+   menuItem -label "Import animation key" -c ("as_animExIm(1)") ;
+   menuItem -label "Import Sets" -c ("as_setsExIm(1)") ;
 
 //==============================
 //   |++|   |+++++|
@@ -390,44 +394,23 @@ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im"
 //   |++| |++|  |oo|
 //   |++|       |oo|
 //   |++|       |oo|
-window -title "Grid of Camera" -titleBar 0 -resizeToFitChildren on win_GoC ;
+ window -title "Grid of Camera" -titleBar 0 -widthHeight 1 1 -topLeftCorner ($cy+115) ($cx+5) -resizeToFitChildren on win_GoC ;
 
-$lsc = ` ls -type "camera" ` ;
-gridLayout -numberOfColumns 1 -cellWidthHeight 140 36 ;
+ $lsc = ` ls -type "camera" ` ;
+ gridLayout -numberOfColumns 1 -cellWidthHeight 140 36 ;
+ $i = 0 ;
+ while($i<size($lsc)){
+  $p = ` listRelatives -parent $lsc[$i] ` ;
+   rowLayout -numberOfColumns 2 -columnWidth2 120 20 ;
+   nodeIconButton -style "textOnly" -width 120 -height 36 -label $p[0] -c ("lookThroughModelPanel "+$lsc[$i]+" (`getPanel -withFocus`)") ;
+   nodeIconButton -style "textOnly" -width 20 -height 36 -label "" -c ("as_cameraWindow(\""+$lsc[$i]+"\")") ;
+   setParent ..;
+  $i++;
+ }
 
-$i = 0 ;
-while($i<size($lsc)){
- $p = ` listRelatives -parent $lsc[$i] ` ;
-  rowLayout -numberOfColumns 2 -columnWidth2 120 20 ;
-  nodeIconButton -style "textOnly" -width 120 -height 36 -label $p[0] -c ("lookThroughModelPanel "+$lsc[$i]+" (`getPanel -withFocus`)") ;
-  nodeIconButton -style "textOnly" -width 20 -height 36 -label "" -c ("as_cameraWindow(\""+$lsc[$i]+"\")") ;
-  setParent ..;
- $i++;
-}
+ //==============================
+ for($win in $winList) showWindow $win ;
 
-
-//==============================
-$cx = 960 ; $cy = 540 ;
-$cPos = python("ashb.mouseCursor()");
-$cx = $cPos[0]; $cy = $cPos[1];
-
-windowPref -e -widthHeight 1 1 -topLeftCorner ($cy-170) ($cx-150) -maximized 0 -saveAll win_ConsG ;
-showWindow win_ConsG ;
-
-windowPref -e -widthHeight 1 1 -topLeftCorner ($cy-170) ($cx+5) -maximized 0 -saveAll win_DeG ;
-showWindow win_DeG ;
-
-windowPref -e -widthHeight 1 1 -topLeftCorner ($cy+115) ($cx+5) -maximized 0 -saveAll win_GoC ;
-showWindow win_GoC ;
-
-windowPref -e -widthHeight 1 1 -topLeftCorner ($cy-240) ($cx-150) -maximized 0 -saveAll win_GoS ;
-showWindow win_GoS ;
-
-windowPref -e -widthHeight 1 1 -topLeftCorner ($cy-250) ($cx-265) -maximized 0 -saveAll win_GoOs ;
-showWindow win_GoOs ;
-
-windowPref -e -widthHeight 1 1 -topLeftCorner ($cy+3) ($cx+3) -maximized 0 -saveAll win_GoSet ;
-showWindow win_GoSet ;
 }
 
 //================ center block ==============
