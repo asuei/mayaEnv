@@ -21,6 +21,36 @@ def selectionExIm(m):
   with open(dir) as f: sel = json.load(f)
   cmds.select(sel,r=1)
 
+def softCluster():
+ selection = cmds.ls(sl=True)
+ richSel = om.MRichSelection()
+ om.MGlobal.getRichSelection(richSel)
+ richSelList = om.MSelectionList()
+ richSel.getSelection(richSelList)
+ 
+ cluster = cmds.cluster( rel=True )
+ cmds.setAttr(cluster[1]+'.rotate',lock=1)
+ cmds.setAttr(cluster[1]+'.scale',lock=1)
+ cmds.setAttr(cluster[1]+'.v',keyable=0,cb=1)
+ clusterSet = cmds.listConnections( cluster, type='objectSet' )
+ 
+ for i,x in enumerate(selection) :
+  path = om.MDagPath()
+  component = om.MObject()
+  richSelList.getDagPath(i, path, component)
+  componentFn = om.MFnSingleIndexedComponent(component)
+  
+  for ii in range(0,componentFn.elementCount()):
+   weight = componentFn.weight(ii)
+   v = componentFn.element(ii)
+   w = weight.influence()
+   sel = x.split('.')
+   pn = sel[1].split('[')[0] # point name
+   vtx = (sel[0]+'.'+pn+'['+str(v)+']')
+   cmds.sets(vtx, add=clusterSet[0])
+   cmds.percent(cluster[0], vtx,  v=w )
+  cmds.select(cluster[1])
+
 def vertexInferencePaintWeight():
  sl = cmds.ls(sl=1,fl=1)
  sk = mel.eval('findRelatedSkinCluster("'+sl[0].split('.')[0]+'")')

@@ -1107,45 +1107,10 @@ global proc as_cluster(int $mode){
   if($mode==2) for($x in `ls -sl`) cluster -relative $x ;
  }
  else{
-  if(`softSelect -q -softSelectEnabled`) as_softCluster ;
+  //if(`softSelect -q -softSelectEnabled`) as_softCluster ;
+  if(`softSelect -q -softSelectEnabled`) python("ashb.softCluster()") ;
   else cluster -relative ;
  }
-}
-
-global proc as_softCluster(){
- $cmd = ""
- +"import maya.OpenMaya as om \n"
- +"selection = cmds.ls(sl=True) \n"
- +"richSel = om.MRichSelection() \n"
- +"om.MGlobal.getRichSelection(richSel) \n"
- +"richSelList = om.MSelectionList() \n"
- +"richSel.getSelection(richSelList) \n"
- 
- +"cluster = cmds.cluster( rel=True ) \n"
- +"cmds.setAttr(cluster[1]+'.rotate',lock=1) \n"
- +"cmds.setAttr(cluster[1]+'.scale',lock=1) \n"
- +"cmds.setAttr(cluster[1]+'.v',keyable=0,cb=1) \n"
- +"clusterSet = cmds.listConnections( cluster, type=\"objectSet\" ) \n"
- 
- +"for i,x in enumerate(selection) : \n"
- +" path = om.MDagPath() \n"
- +" component = om.MObject() \n"
- +" richSelList.getDagPath(i, path, component) \n"
- +" componentFn = om.MFnSingleIndexedComponent(component) \n"
- 
- +" for ii in range(0,componentFn.elementCount()): \n"
- +"  weight = componentFn.weight(ii) \n"
- +"  v = componentFn.element(ii) \n"
- +"  w = weight.influence() \n"
- +"  sel = x.split('.') \n"
- +"  pn = sel[1].split('[')[0] \n" // point name
- +"  vtx = (sel[0]+'.'+pn+'['+str(v)+']') \n"
- +"  cmds.sets(vtx, add=clusterSet[0]) \n" // trun off component ID in 2022
- +"  cmds.percent(cluster[0], vtx,  v=w ) \n"
- 
- +"cmds.select(cluster[1])" ;
- 
- python($cmd) ;
 }
 
 global proc as_reorderHistory(int $od){
