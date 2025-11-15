@@ -3,11 +3,23 @@ import maya.cmds as cmds
 import maya.mel as mel
 import maya.OpenMaya as om
 import re
+import json
 from PySide2 import QtGui
 
 def mouseCursor():
  cursorPos = QtGui.QCursor().pos()
  return [cursorPos.x(),cursorPos.y()]
+
+def selectionExIm(m):
+ dir = mel.eval('whatIs asueiHotbox')
+ dir = dir.replace('Mel procedure found in: ','')
+ dir = dir.replace('asueiHotbox.mel','asueiHotboxExportSelection.json')
+ sel = cmds.ls(selection=1)
+ if(m==0):
+  with open(dir,'w') as f: json.dump(sel,f,ensure_ascii=False,indent=1)
+ if(m==1):
+  with open(dir) as f: sel = json.load(f)
+  cmds.select(sel,r=1)
 
 def vertexInferencePaintWeight():
  sl = cmds.ls(sl=1,fl=1)
@@ -30,8 +42,10 @@ def vertexInferencePaintWeight():
  mel.eval('ArtPaintSkinWeightsTool') 
  tv = cmds.treeView('theSkinClusterInflList',q=1,ch='')
  for x in tv :
-  if x not in infList :
-   cmds.treeView('theSkinClusterInflList',e=1,itemVisible=[x,0])
+  if x in infList :
+   cmds.treeView('theSkinClusterInflList',e=1,selectItem=[x,1])
+  else:
+   cmds.treeView('theSkinClusterInflList',e=1,selectItem=[x,0])
 
 class as_namingUI :
  def __init__(self):
