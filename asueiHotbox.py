@@ -6,20 +6,86 @@ import re
 import json
 from PySide2 import QtGui
 
+dir = ''
+if(dir == ''):
+ dir = mel.eval('whatIs asueiHotbox')
+ dir = dir.replace('Mel procedure found in: ','')
+ dir = dir.replace('asueiHotbox.mel','')
+
 def mouseCursor():
  cursorPos = QtGui.QCursor().pos()
  return [cursorPos.x(),cursorPos.y()]
 
-def selectionExIm(m):
- dir = mel.eval('whatIs asueiHotbox')
- dir = dir.replace('Mel procedure found in: ','')
- dir = dir.replace('asueiHotbox.mel','asueiHotboxExportSelection.json')
- sel = cmds.ls(selection=1)
+def fileExIm(m):
+ filePath = dir + 'asueiHotboxExportTemp.mb'
  if(m==0):
-  with open(dir,'w') as f: json.dump(sel,f,ensure_ascii=False,indent=1)
+  cmds.file(filePath,f=1,typ='mayaBinary',pr=1,exportSelected=1)
+  print('Export to '+filePath) ;
  if(m==1):
-  with open(dir) as f: sel = json.load(f)
+  cmds.file(filePath,i=True,type='mayaBinary',ignoreVersion=1,ra=1,mergeNamespacesOnClash=1,namespace=':',pr=1)
+
+def selectionExIm(m):
+ filePath = dir+'asueiHotboxExportSelection.json'
+ if(m==0):
+  sel = cmds.ls(selection=1)
+  with open(filePath,'w') as f: json.dump(sel,f,ensure_ascii=False,indent=1)
+  print(filePath)
+ if(m==1):
+  with open(filePath) as f: sel = json.load(f)
   cmds.select(sel,r=1)
+
+def skinWeightExIm(m):
+ filePath = dir + 'asueiHotboxExportSkinWeight.json'
+ skwt = []
+ if(m==1 or m==2):
+  with open(filePath) as f: skwt = json.load(f)
+ sl = cmds.ls(selection=1)
+ if(m==2): sl = cmds.ls(selection=1,flatten=1)
+ 
+ for i in range(len(sl)): # loop of selected objects
+  obj = sl[i]
+  skn = mel.eval('findRelatedSkinCluster("'+obj+'")')
+  vInfo = []
+  if(m==1):
+   vInfo = skwt[i]
+   jInf = [ x[0] for x in vInfo[0] ]
+   noInf = []
+   for y in jInf :
+    if(cmds.objExists(y)==0): noIng.append(y)
+   sas = " ".join(noInf)
+   if len(noInf) > 0: cmds.error("There are no : " + sas)
+   if(skn=='' and m != 2):
+    skn = cmds.skinCluster(jInf,obj,toSelectedBones=1)[0]
+   else:
+    inf = cmds.skinCluster(skn,q=1,influence=1)
+    for j in range(len(jInf)) :
+     ci = inf.index(jInf[j]) if jInf[j] in inf else -1
+     if(ci==-1): cmds.skinCluster(skn,e=1,addInfluence=jInf[j],weight=0)
+    
+  vn = cmds.polyEvaluate(obj,vertex=1)
+  for j in range(vn):
+   if(m==0):
+    tList = cmds.skinPercent(skn,obj+'.vtx['+str(j)+']',transform=None,q=1)
+    vList = cmds.skinPercent(skn,obj+'.vtx['+str(j)+']',q=1,value=1)
+    vInfo.append([ (x,y) for x,y in zip(tList,vList) ])
+   elif(m==1):
+    vName = sl[i]+'.vtx['+str(j)+']' 
+    if(cmds.objExists(vName)) : cmds.skinPercent(skn,vName,transformValue=vInfo[j])
+    
+  if(m==2):
+   vInfo = skwt[0]
+   obj = sl[i].split('.')[0]
+   skn = mel.eval('findRelatedSkinCluster("'+obj+'")')
+   vN = sl[i].split('[')[-1]
+   vN = vN.replace(']','')
+   iVn = int(vN)
+   cmds.skinPercent(skn,sl[i],transformValue=vInfo[iVn])
+  
+  if(m==0): skwt.append(vInfo)
+ if(m==0):
+  with open(filePath, 'w') as f: json.dump(skwt,f,ensure_ascii=False,indent=1)
+ print(filePath)
+ pass
 
 def softCluster():
  selection = cmds.ls(sl=True)

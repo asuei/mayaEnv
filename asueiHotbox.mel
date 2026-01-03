@@ -1,8 +1,9 @@
 global proc asueiHotbox(){
- //python("import maya.cmds as cmds");
  python("import sys");
- //python("import maya.OpenMaya as om");
  python("import imp");
+ 
+ $main = python("__name__") ;
+ //print $main ;
  
  $dir = ` whatIs asueiHotbox ` ;
  python("pPath = '"+$dir+"'.replace('Mel procedure found in: ','')") ;
@@ -27,16 +28,17 @@ global proc asueiHotbox(){
 
  for($x in $sl){
   $gc = ` listHistory -interestLevel 1 -pruneDagObjects 1 $x ` ;
-  for($y in $gc){
-   $nt = ` nodeType $y ` ;
+  //for($y in $gc){
+  for($j=0;$j<size($gc)&&$j<15;$j++){
+   $nt = ` nodeType $gc[$j] ` ;
    if($nt=="skinCluster") $eSkin = 7 ;
    if($nt=="blendShape") $eBs = 1 ;
    if($nt=="cluster") $eCc = 1 ;
    if($nt=="textureDeformer") $eTxt = 1 ;
   }
   $gc = ` listHistory -interestLevel 1 -pruneDagObjects 0 $x ` ;
-  for($y in $gc){
-   $nt = ` nodeType $y ` ;
+  for($j=0;$j<size($gc)&&$j<15;$j++){
+   $nt = ` nodeType $gc[$j] ` ;
    if($nt=="nCloth") $eCloth = 1 ;
   }
   $nt = ` nodeType $x ` ;
@@ -55,6 +57,7 @@ global proc asueiHotbox(){
   string $mna[] ;
   $i = 0 ;
   while($i<size($lsf)&&$i<50){
+   $x = $lsf[$i] ;
    $mn = stringToStringArray($x,".") ;
    $mna[size($mna)] = $mn[0] ;
    $i++ ;
@@ -251,7 +254,7 @@ if($eCrv>0){
   popupMenu -parent ashb_sfr ;
   menuItem -label "abc Range" -command ("as_abcRange") ;
  iconTextButton -style "textOnly" -label "cam\nPref" -c ("as_camPref()") ashb_camRref ;
- iconTextButton -style "textOnly" -label "joint" -c ("if($meJo==0){ modelEditor -e -joints 1 modelPanel4; $meJo=1; } else { modelEditor -e -joints 0 modelPanel4; $meJo=0; }") ;
+ iconTextButton -style "textOnly" -label "joint" -c ("modelEditor -e -joints (1-`modelEditor -q -joints modelPanel4`) modelPanel4") ;
  iconTextButton -style "textOnly" -label "farClip" -c ("as_nfClip(0)") ashb_clip ;
   popupMenu -parent ashb_clip ;
    menuItem -label "x 0.1" -command ("as_nfClip(1)") ;
@@ -369,17 +372,17 @@ if($eCrv>0){
  iconTextButton -style "iconAndTextCentered" -image1 "flow.png" -label "" -command ("sets `ls -sl`;") ;
  iconTextButton -style "iconAndTextCentered" -image1 "flowSurface.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -add $sl[size($sl)-1] $sl2 ;") ;
  iconTextButton -style "iconAndTextCentered" -image1 "flowSurfaceDelete.png" -label "" -command ("$sl = $sl2 = `ls -sl` ; $sls = (size($sl)-1) ; stringArrayRemoveAtIndex($sls,$sl2); sets -remove $sl[size($sl)-1]  ;") ;
- iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Ex" -command ("as_quickExIm(0)") ashb_qe ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Ex" -command ("python(\"ashb.fileExIm(0)\")") ashb_qe ;
   popupMenu -parent ashb_qe ;
    menuItem -label "Export Selection" -c ("python(\"ashb.selectionExIm(0)\")") ;
-   menuItem -label "Export skin weight" -c ("as_skinWeightExIm(0)") ;
+   menuItem -label "Export skin weight" -c ("python(\"ashb.skinWeightExIm(0)\")") ;
    menuItem -label "Export animation key" -c ("as_animExIm(0)") ;
    menuItem -label "Export Sets" -c ("as_setsExIm(0)") ;
- iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im" -command ("as_quickExIm(1)") ashb_qi ;
+ iconTextButton -style "iconAndTextCentered" -image1 "vacantCell.png" -label "Im" -command ("python(\"ashb.fileExIm(1)\")") ashb_qi ;
   popupMenu -parent ashb_qi ;
    menuItem -label "Import Selection" -c ("python(\"ashb.selectionExIm(1)\")") ;
-   menuItem -label "Import skin weight" -c ("as_skinWeightExIm(1)") ;
-   menuItem -label "Import skin weight by vertex" -c ("as_skinWeightExIm(2)") ;
+   menuItem -label "Import skin weight" -c ("python(\"ashb.skinWeightExIm(1)\")") ;
+   menuItem -label "Import skin weight by vertex" -c ("python(\"ashb.skinWeightExIm(2)\")") ;
    menuItem -label "Import animation key" -c ("as_animExIm(1)") ;
    menuItem -label "Import Sets" -c ("as_setsExIm(1)") ;
 
@@ -1484,6 +1487,7 @@ global proc as_quatRot(string $axis){
  }
 }
 
+/*
 global proc as_quickExIm(int $i){
  $dir = ` whatIs asueiHotbox ` ;
  $dir = python("'"+$dir+"'.replace('Mel procedure found in: ','')") ;
@@ -1491,7 +1495,9 @@ global proc as_quickExIm(int $i){
  if($i==0) file -force -options "v=0;" -typ "mayaBinary" -pr -exportSelected $dir ; print ("Export to "+$dir) ;
  if($i==1)  file -import -type "mayaBinary"  -ignoreVersion -ra true -mergeNamespacesOnClash true -namespace ":" -options "v=0;"  -pr $dir ; print ("Import from "+$dir) ;
 }
+*/	
 
+/*
 global proc as_skinWeightExIm(int $m){
  python("import json");
  $dir = ` whatIs asueiHotbox ` ;
@@ -1555,6 +1561,7 @@ global proc as_skinWeightExIm(int $m){
  if($m==0) python("with open('"+$dir+"', 'w') as f: json.dump(skwt,f,ensure_ascii=False,indent=1)");
  print $dir ;
 }
+*/
 
 global proc int as_animExIm(int $m){
  $sl = ` ls -l -sl ` ;
